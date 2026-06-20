@@ -403,3 +403,203 @@
         .btn {
             display: inline-block;
             padding: 12px 26px;
+            background-color: var(--primary-yellow);
+            color: var(--text-dark);
+            border: 2px solid var(--primary-yellow);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: 800;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover, .btn:active {
+            background-color: #000000;
+            color: var(--primary-yellow);
+            border-color: var(--primary-yellow);
+            transform: scale(1.03);
+            box-shadow: 0 0 15px rgba(255, 235, 0, 0.4);
+        }
+
+        footer {
+            text-align: center;
+            padding: 70px 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="cinematic-bg"></div>
+    <div id="bg-grid-overlay"></div>
+
+    <nav>
+        <h1>PHOTON</h1>
+        <ul>
+            <li><a href="#hero">Track</a></li>
+            <li><a href="#team">Team</a></li>
+            <li><a href="#sponsors">Partners</a></li>
+            <li><a href="#portfolios">Docs</a></li>
+        </ul>
+    </nav>
+
+    <header id="hero">
+        <h2 class="reveal">PHOTON</h2>
+        <p class="reveal">At the speed of light</p>
+        <div id="car-viewer" class="reveal"></div>
+    </header>
+
+    <section id="team">
+        <h3 class="section-title reveal">Team Roles</h3>
+        
+        <div style="margin-bottom: 60px;">
+            <h4 class="sub-tier-title reveal">Engineering Division</h4>
+            <div class="team-grid">
+                
+                <div class="team-card reveal">
+                    <div class="member-image-slot">Placeholder Photo</div>
+                    <div class="member-info">
+                        <h4>Gifford Roy</h4>
+                        <p>Design Engineer</p>
+                    </div>
+                </div>
+
+                <div class="team-card reveal">
+                    <div class="member-image-slot">Placeholder Photo</div>
+                    <div class="member-info">
+                        <h4>Bruno Gomez Pena</h4>
+                        <p>Manufacturing Engineer</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div>
+            <h4 class="sub-tier-title reveal">Enterprise Division</h4>
+            <div class="team-grid">
+                
+                <div class="team-card reveal">
+                    <div class="member-image-slot">Placeholder Photo</div>
+                    <div class="member-info">
+                        <h4>Evan Goodwin</h4>
+                        <p>Team Manager</p>
+                    </div>
+                </div>
+
+                <div class="team-card reveal">
+                    <div class="member-image-slot">Placeholder Photo</div>
+                    <div class="member-info">
+                        <h4>Zeke Short</h4>
+                        <p>Resource Manager</p>
+                    </div>
+                </div>
+
+                <div class="team-card reveal">
+                    <div class="member-image-slot">Placeholder Photo</div>
+                    <div class="member-info">
+                        <h4>Lizzie Cooke</h4>
+                        <p>Graphic Design</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="sponsors">
+        <h3 class="section-title reveal">Our Partners</h3>
+        <div class="sponsor-tier-container">
+            
+            <div class="tier-group platinum reveal">
+                <div class="tier-title">Platinum Partners</div>
+                <div class="sponsor-grid">
+                    <div class="sponsor-card">Sponsor Slot</div>
+                    <div class="sponsor-card">Sponsor Slot</div>
+                </div>
+            </div>
+
+            <div class="tier-group gold reveal">
+                <div class="tier-title">Gold Partners</div>
+                <div class="sponsor-grid">
+                    <div class="sponsor-card">Sponsor Slot</div>
+                    <div class="sponsor-card">Sponsor Slot</div>
+                    <div class="sponsor-card">Sponsor Slot</div>
+                </div>
+            </div>
+
+            <div class="tier-group silver reveal">
+                <div class="tier-title">Silver Partners</div>
+                <div class="sponsor-grid">
+                    <div class="sponsor-card">Partner</div>
+                    <div class="sponsor-card">Partner</div>
+                    <div class="sponsor-card">Partner</div>
+                    <div class="sponsor-card">Partner</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="portfolios">
+        <h3 class="section-title reveal">Engineering & Enterprise</h3>
+        <div class="portfolio-grid">
+            <div class="portfolio-card reveal">
+                <h4>Engineering Portfolio</h4>
+                <p>Deep-dive analysis on fluid dynamics, chassis design optimization, and machining tolerances.</p>
+                <a href="#" class="btn">View Document</a>
+            </div>
+            <div class="portfolio-card reveal">
+                <h4>Enterprise Portfolio</h4>
+                <p>Brand activation strategy, corporate outreach systems, budget tracking, and project workflow matrices.</p>
+                <a href="#" class="btn">View Document</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 PHOTON. ALL RIGHTS RESERVED.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="script.js"></script>
+
+    <script>
+        if (window.history.scrollRestoration) {
+            window.history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
+        const bgGradient = document.getElementById('cinematic-bg');
+
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            bgGradient.style.transform = `translateY(-${scrolled * 0.3}px)`;
+        }, { passive: true });
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target); 
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(element => {
+            observer.observe(element);
+        });
+    </script>
+</body>
+</html>
