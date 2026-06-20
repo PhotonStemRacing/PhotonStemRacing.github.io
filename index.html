@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Photon | STEM Team</title>
     
+    <!-- Link to the custom tab icon -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
+    <!-- Import the web component for interactive 3D rendering and animations -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
+    <!-- Embedded Stylesheet -->
     <style>
         :root {
             --primary-yellow: #ffeb00;  
@@ -55,9 +58,7 @@
             pointer-events: none;
         }
 
-        /* Ambient Parallax Grid Glow Space Platform Wrapper 
-           FIX: Set up as a document-level absolute flow layer covering the total content height
-        */
+        /* Ambient Parallax Grid Glow Space Platform Wrapper */
         #glow-particles-container {
             position: absolute;
             top: 0;
@@ -69,7 +70,7 @@
             overflow: hidden;
         }
 
-        /* REVISED: Massively expanded, ultra-bright glowing orb structures */
+        /* Massively expanded, ultra-bright glowing orb structures */
         .glow-particle {
             position: absolute;
             left: var(--x);
@@ -380,10 +381,7 @@
         }
 
         /* FULLSCREEN ADJUSTMENTS */
-        #car-viewer:fullscreen .viewer-details {
-            display: none !important;
-        }
-
+        #car-viewer:fullscreen .viewer-details { display: none !important; }
         #car-viewer:fullscreen {
             background-color: #000000 !important;
             background-image: linear-gradient(rgba(255, 235, 0, 0.12) 1px, transparent 1px),
@@ -391,10 +389,7 @@
             background-size: 50px 50px !important;
         }
 
-        /* Webkit isolated presentation rules */
-        #car-viewer:-webkit-full-screen .viewer-details {
-            display: none !important;
-        }
+        #car-viewer:-webkit-full-screen .viewer-details { display: none !important; }
         #car-viewer:-webkit-full-screen {
             background-color: #000000 !important;
             background-image: linear-gradient(rgba(255, 235, 0, 0.12) 1px, transparent 1px),
@@ -402,12 +397,8 @@
             background-size: 50px 50px !important;
         }
 
-        #car-viewer:fullscreen .fullscreen-toggle {
-            bottom: 50px;
-        }
-        #car-viewer:-webkit-full-screen .fullscreen-toggle {
-            bottom: 50px;
-        }
+        #car-viewer:fullscreen .fullscreen-toggle { bottom: 50px; }
+        #car-viewer:-webkit-full-screen .fullscreen-toggle { bottom: 50px; }
 
         /* Content Sections Base */
         section {
@@ -742,8 +733,8 @@
 </head>
 <body>
 
+    <!-- Infrastructure Base Overlay Layouts -->
     <div id="bg-grid-overlay"></div>
-    
     <div id="glow-particles-container"></div>
 
     <nav>
@@ -759,6 +750,7 @@
         </ul>
     </nav>
 
+    <!-- Entry Zone Layout -->
     <header id="hero">
         <div id="hero-text-container">
             <h2>PHOTON</h2>
@@ -790,13 +782,13 @@
         </div>
     </header>
 
+    <!-- Team Roles Section -->
     <section id="team">
         <h3 class="section-title reveal">Team Roles</h3>
         
         <div style="margin-bottom: 80px;">
             <h4 class="sub-tier-title reveal">Engineering Division</h4>
             <div class="team-grid">
-                
                 <div class="team-card reveal">
                     <div class="member-image-slot">Placeholder Photo</div>
                     <div class="member-info">
@@ -804,7 +796,6 @@
                         <p>Design Engineer</p>
                     </div>
                 </div>
-
                 <div class="team-card reveal">
                     <div class="member-image-slot">Placeholder Photo</div>
                     <div class="member-info">
@@ -812,14 +803,12 @@
                         <p>Manufacturing Engineer</p>
                     </div>
                 </div>
-
             </div>
         </div>
 
         <div>
             <h4 class="sub-tier-title reveal">Enterprise Division</h4>
             <div class="team-grid">
-                
                 <div class="team-card reveal">
                     <div class="member-image-slot">Placeholder Photo</div>
                     <div class="member-info">
@@ -827,7 +816,6 @@
                         <p>Team Manager</p>
                     </div>
                 </div>
-
                 <div class="team-card reveal">
                     <div class="member-image-slot">Placeholder Photo</div>
                     <div class="member-info">
@@ -835,7 +823,6 @@
                         <p>Resource Manager</p>
                     </div>
                 </div>
-
                 <div class="team-card reveal">
                     <div class="member-image-slot">Placeholder Photo</div>
                     <div class="member-info">
@@ -843,15 +830,14 @@
                         <p>Graphic Design</p>
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
 
+    <!-- Sponsorship Pipeline -->
     <section id="sponsors">
         <h3 class="section-title reveal">Our Partners</h3>
         <div class="sponsor-tier-container">
-            
             <div class="tier-group platinum reveal">
                 <div class="tier-title">Platinum Partners</div>
                 <div class="sponsor-grid">
@@ -859,7 +845,6 @@
                     <div class="sponsor-card">Sponsor Slot</div>
                 </div>
             </div>
-
             <div class="tier-group gold reveal">
                 <div class="tier-title">Gold Partners</div>
                 <div class="sponsor-grid">
@@ -868,7 +853,6 @@
                     <div class="sponsor-card">Sponsor Slot</div>
                 </div>
             </div>
-
             <div class="tier-group silver reveal">
                 <div class="tier-title">Silver Partners</div>
                 <div class="sponsor-grid">
@@ -878,10 +862,10 @@
                     <div class="sponsor-card">Partner</div>
                 </div>
             </div>
-
         </div>
     </section>
 
+    <!-- Documents -->
     <section id="portfolios">
         <h3 class="section-title reveal">Engineering & Enterprise</h3>
         <div class="portfolio-grid">
@@ -898,6 +882,7 @@
         </div>
     </section>
 
+    <!-- Dedicated Interactive Contact Section -->
     <section id="contact">
         <h3 class="section-title reveal">Connect With Us</h3>
         <div class="contact-box reveal">
@@ -906,24 +891,22 @@
         </div>
     </section>
 
+    <!-- Affiliated Institutional Logos Section -->
     <div class="institutional-logos">
         <h5>Affiliated Entities</h5>
         <div class="logo-flex">
-            
             <a href="https://rea.org.au/f1-in-schools/" target="_blank" class="logo-item reveal">
                 <div class="logo-wrapper">
                     <img src="stem_racing_logo.PNG" alt="STEM Racing Australia">
                 </div>
                 <p>STEM Racing</p>
             </a>
-
             <a href="https://riversidehigh.education.tas.edu.au/" target="_blank" class="logo-item reveal">
                 <div class="logo-wrapper">
                     <img src="riverside_logo.JPG" alt="Riverside High School Launceston">
                 </div>
                 <p>Riverside High School</p>
             </a>
-
         </div>
     </div>
 
@@ -942,12 +925,10 @@
         }
         window.scrollTo(0, 0);
 
-        // REVISED: Contextual, responsive document-wide macro glow generator script
         function initializeGridGlowSystem() {
             const glowTargetBox = document.getElementById('glow-particles-container');
-            glowTargetBox.innerHTML = ''; // Sanitize duplicate execution passes
+            glowTargetBox.innerHTML = ''; 
             
-            // Acquire the actual live structural footprint height of the body
             const bodyBoundingHeight = Math.max(
                 document.body.scrollHeight, 
                 document.body.offsetHeight, 
@@ -963,11 +944,9 @@
                 const node = document.createElement('div');
                 node.classList.add('glow-particle');
                 
-                // Position seamlessly across the full calculated vertical depth metrics
                 const nodeX = Math.random() * 100; 
                 const nodeY = Math.random() * documentPixelsToVwUnits; 
                 
-                // Variable large sizes (from 15px up to 55px width fields)
                 const nodeSize = 15 + (Math.random() * 40);
                 const nodeBreatheDuration = 4 + (Math.random() * 5); 
                 const nodePhaseOffset = Math.random() * -8; 
@@ -982,9 +961,7 @@
             }
         }
 
-        // Initialize grid glow system after execution paths open
         window.addEventListener('load', initializeGridGlowSystem);
-        // Recalculate and scale array mapping if viewport windows transform layout dimensions
         let resizeDebounceTimer;
         window.addEventListener('resize', () => {
             clearTimeout(resizeDebounceTimer);
@@ -1062,9 +1039,10 @@
 
         studioToggle.addEventListener('click', (e) => {
             e.preventDefault();
-            isStudioInteractive = !isStudioInteractive;
 
-            if (isStudioInteractive) {
+            if (!isStudioInteractive) {
+                // Turn ON Interactive Studio Mode
+                isStudioInteractive = true;
                 carViewer.setAttribute('camera-controls', '');
                 carViewer.style.pointerEvents = 'auto';
                 
@@ -1074,6 +1052,8 @@
                 studioToggle.textContent = 'Lock Canvas';
                 studioToggle.classList.add('active-studio');
             } else {
+                // Turn OFF Interactive Studio Mode (The Revert Process)
+                isStudioInteractive = false;
                 carViewer.removeAttribute('camera-controls');
                 carViewer.style.pointerEvents = 'none';
                 
@@ -1083,7 +1063,23 @@
                 studioToggle.textContent = 'Explore Car';
                 studioToggle.classList.remove('active-studio');
 
-                requestAnimationFrame(renderCinematicFlyby);
+                // 1. Re-align the mathematical timeline point perfectly facing the user
+                orbitTimeline = Math.PI; 
+                
+                // 2. Pre-calculate the exact coordinates of the cinematic route at that specific timeline frame
+                const targetHorizontal = (orbitTimeline * 180 / Math.PI) % 360; 
+                const targetVertical = 66 + (Math.sin(orbitTimeline * 1.5) * 7); 
+                const targetZoom = 92 + (Math.cos(orbitTimeline * 1.1) * 16); 
+                
+                // 3. Dispatch a single static coordinate change and let the built-in interpolator smoothly glide the viewer back
+                carViewer.cameraOrbit = `${targetHorizontal}deg ${targetVertical}deg ${targetZoom}%`;
+                
+                // 4. Wait 1.8 seconds for the glide to physically complete before flooding it with animation frame updates
+                setTimeout(() => {
+                    if (!isStudioInteractive) {
+                        renderCinematicFlyby();
+                    }
+                }, 1800); 
             }
         });
 
