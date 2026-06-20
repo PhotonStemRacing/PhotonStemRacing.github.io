@@ -157,7 +157,7 @@
             letter-spacing: -1px;
             margin: 0 0 10px 0;
             font-weight: 900;
-            color: #000000; /* High-contrast flat track black */
+            color: #000000; 
         }
 
         #hero p {
@@ -420,14 +420,14 @@
         /* Institutional Affiliations Logo Bar Container */
         .institutional-logos {
             border-top: 1px solid rgba(255, 255, 255, 0.06);
-            background-color: rgba(3, 3, 3, 0.6);
-            padding: 50px 20px;
+            background-color: rgba(5, 5, 5, 0.85);
+            padding: 60px 20px;
             text-align: center;
         }
 
         .institutional-logos h5 {
-            margin: 0 0 25px 0;
-            font-size: 0.8rem;
+            margin: 0 0 35px 0;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 3px;
             color: var(--text-muted);
@@ -437,7 +437,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 60px;
+            gap: 80px;
             flex-wrap: wrap;
         }
 
@@ -446,25 +446,28 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: #ffffff;
-            opacity: 0.6;
-            transition: opacity 0.3s ease;
+            transition: transform 0.3s ease;
         }
 
         .logo-item:hover {
-            opacity: 1;
+            transform: scale(1.05);
         }
 
-        .logo-graphic-placeholder {
-            width: 90px;
-            height: 90px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
+        /* Standardized image container framework to handle different dimension ratios */
+        .logo-wrapper {
+            height: 100px;
+            width: 240px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 12px;
-            background-color: rgba(0, 0, 0, 0.4);
+            margin-bottom: 15px;
+        }
+
+        .logo-wrapper img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
         }
 
         .logo-item p {
@@ -473,6 +476,7 @@
             text-transform: uppercase;
             font-weight: 700;
             letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.6);
         }
 
         footer {
@@ -580,104 +584,3 @@
             <div class="tier-group gold reveal">
                 <div class="tier-title">Gold Partners</div>
                 <div class="sponsor-grid">
-                    <div class="sponsor-card">Sponsor Slot</div>
-                    <div class="sponsor-card">Sponsor Slot</div>
-                    <div class="sponsor-card">Sponsor Slot</div>
-                </div>
-            </div>
-
-            <div class="tier-group silver reveal">
-                <div class="tier-title">Silver Partners</div>
-                <div class="sponsor-grid">
-                    <div class="sponsor-card">Partner</div>
-                    <div class="sponsor-card">Partner</div>
-                    <div class="sponsor-card">Partner</div>
-                    <div class="sponsor-card">Partner</div>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <section id="portfolios">
-        <h3 class="section-title reveal">Engineering & Enterprise</h3>
-        <div class="portfolio-grid">
-            <div class="portfolio-card reveal">
-                <h4>Engineering Portfolio</h4>
-                <p>Deep-dive analysis on fluid dynamics, chassis design optimization, and machining tolerances.</p>
-                <a href="#" class="btn">View Document</a>
-            </div>
-            <div class="portfolio-card reveal">
-                <h4>Enterprise Portfolio</h4>
-                <p>Brand activation strategy, corporate outreach systems, budget tracking, and project workflow matrices.</p>
-                <a href="#" class="btn">View Document</a>
-            </div>
-        </div>
-    </section>
-
-    <div class="institutional-logos">
-        <h5>Affiliated Entities</h5>
-        <div class="logo-flex">
-            
-            <div class="logo-item">
-                <div class="logo-graphic-placeholder">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 13 22 22 3 11"/></svg>
-                </div>
-                <p>STEM Racing</p>
-            </div>
-
-            <div class="logo-item">
-                <div class="logo-graphic-placeholder">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/></svg>
-                </div>
-                <p>Riverside High School</p>
-            </div>
-
-        </div>
-    </div>
-
-    <footer>
-        <p>&copy; 2026 PHOTON. ALL RIGHTS RESERVED.</p>
-    </footer>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="script.js"></script>
-
-    <script>
-        if (window.history.scrollRestoration) {
-            window.history.scrollRestoration = 'manual';
-        }
-        window.scrollTo(0, 0);
-
-        const bgGradient = document.getElementById('cinematic-bg');
-
-        // Fixed Parallax Engine: Modulates both translation and scale smoothly based on viewport progression
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const rate = scrolled * 0.4;
-            
-            // Compresses the yellow zone upward smoothly without breaking layout bounds
-            bgGradient.style.transform = `translateY(-${rate}px) scaleY(${1 - (scrolled * 0.0005)})`;
-        }, { passive: true });
-
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.1
-        };
-
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                    observer.unobserve(entry.target); 
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.reveal').forEach(element => {
-            observer.observe(element);
-        });
-    </script>
-</body>
-</html>
