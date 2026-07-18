@@ -50,10 +50,15 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-image: linear-gradient(rgba(255, 235, 0, 0.07) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255, 235, 0, 0.07) 1px, transparent 1px);
-            background-size: 60px 60px;
-            background-position-y: calc(var(--scroll-y) * -0.4);
+            background-color: #060606;
+            /* Woven carbon-fibre crosshatch sits underneath the neon measurement grid */
+            background-image:
+                repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.035) 0px, rgba(255, 255, 255, 0.035) 2px, transparent 2px, transparent 7px),
+                repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.5) 0px, rgba(0, 0, 0, 0.5) 2px, rgba(20, 20, 20, 0.5) 2px, rgba(20, 20, 20, 0.5) 7px),
+                linear-gradient(rgba(255, 235, 0, 0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 235, 0, 0.07) 1px, transparent 1px);
+            background-size: 10px 10px, 10px 10px, 60px 60px, 60px 60px;
+            background-position-y: 0, 0, calc(var(--scroll-y) * -0.4), calc(var(--scroll-y) * -0.4);
             z-index: 1;
             pointer-events: none;
         }
@@ -98,6 +103,35 @@
                 opacity: 0.9;
                 transform: translateY(calc(var(--scroll-y) * 0.25)) scale(1.15);
             }
+        }
+
+        /* FRACTURED FROSTED GLASS treatment, shared by every card-style box on the page */
+        .team-card,
+        .sponsor-card,
+        .portfolio-card,
+        .contact-box {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 45%, rgba(255, 235, 0, 0.035) 75%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(22px) saturate(150%);
+            -webkit-backdrop-filter: blur(22px) saturate(150%);
+        }
+
+        /* Angled cracked-light facets layered across every glass box */
+        .team-card::before,
+        .sponsor-card::before,
+        .portfolio-card::before,
+        .contact-box::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(113deg, transparent 22%, rgba(255, 255, 255, 0.05) 23%, transparent 26%),
+                linear-gradient(68deg, transparent 48%, rgba(255, 255, 255, 0.045) 49%, transparent 53%),
+                linear-gradient(158deg, transparent 68%, rgba(255, 255, 255, 0.035) 69%, transparent 73%),
+                linear-gradient(20deg, transparent 85%, rgba(255, 235, 0, 0.04) 86%, transparent 90%);
+            pointer-events: none;
+            z-index: 1;
         }
 
         /* Scroll Animation Reveal Targets */
@@ -285,6 +319,18 @@
             transition: pointer-events 0.3s ease;
         }
 
+        /* Glowing orbs rendered as children of #car-viewer itself, so they are still visible
+           when the browser's fullscreen "top layer" isolates #car-viewer from the rest of the
+           page (the site-wide #glow-particles-container lives outside it and disappears in
+           fullscreen/Explore mode otherwise) */
+        #car-viewer-glow {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
         /* Fullscreen View Widget Switcher */
         .fullscreen-toggle {
             position: absolute;
@@ -456,14 +502,10 @@
         }
 
         .team-card {
-            background: var(--card-bg);
             border: 1px solid rgba(255, 235, 0, 0.1);
             border-radius: 12px;
-            overflow: hidden;
             text-align: center;
             width: 290px; 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), 
                         border-color 0.5s, box-shadow 0.5s;
         }
@@ -539,15 +581,12 @@
         }
 
         .sponsor-card {
-            background: rgba(15, 15, 15, 0.8);
             border: 1px dashed rgba(255, 235, 0, 0.2);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            transition: background 0.4s, border-style 0.4s, border-color 0.4s, color 0.4s, box-shadow 0.4s;
+            transition: background 0.4s, border-style 0.4s, border-color 0.4s, color 0.4s, box-shadow 0.4s, transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
             color: #666666;
             font-weight: 700;
             font-size: 0.9rem;
@@ -555,7 +594,6 @@
             letter-spacing: 2px;
         }
 
-        .platinum .sponsor-card { width: 380px; height: 180px; }
         .gold .sponsor-card { width: 300px; height: 140px; }
         .silver .sponsor-card { width: 220px; height: 110px; font-size: 0.8rem; }
 
@@ -567,6 +605,53 @@
             box-shadow: 0 0 15px rgba(255, 235, 0, 0.15);
         }
 
+        /* Platinum tier: bigger base size, and a much bigger, elevated hover state */
+        .platinum .sponsor-card {
+            width: 460px;
+            height: 220px;
+        }
+
+        .platinum .sponsor-card:hover {
+            transform: scale(1.22);
+            z-index: 6;
+            box-shadow: 0 0 40px rgba(255, 235, 0, 0.3), 0 30px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Sliding logo/video reveal layers, used inside platinum cards only */
+        .sponsor-logo-layer,
+        .sponsor-video-layer {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .sponsor-logo-layer {
+            z-index: 3;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(255, 235, 0, 0.03) 100%);
+            color: #777777;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* After 5 continuous seconds of hover, the logo slides left to reveal the video layer */
+        .platinum .sponsor-card:hover .sponsor-logo-layer {
+            transform: translateX(-100%);
+            transition-delay: 5s;
+        }
+
+        .sponsor-video-layer {
+            z-index: 2;
+            background: repeating-linear-gradient(135deg, #060606 0px, #060606 10px, #0e0e0e 10px, #0e0e0e 20px);
+            color: #4a4a4a;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            gap: 10px;
+            flex-direction: column;
+        }
+
         .portfolio-grid {
             display: flex;
             justify-content: center;
@@ -575,14 +660,11 @@
         }
 
         .portfolio-card {
-            background: var(--card-bg);
             padding: 55px;
             border-radius: 12px;
             width: 340px;
             border: 1px solid rgba(255, 235, 0, 0.1);
             border-top: 4px solid var(--primary-yellow);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s;
         }
 
@@ -636,12 +718,9 @@
         }
 
         .contact-box {
-            background: var(--card-bg);
             border: 1px solid rgba(255, 235, 0, 0.2);
             border-radius: 12px;
             padding: 70px 50px;
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
             box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 235, 0, 0.05);
         }
 
@@ -891,6 +970,7 @@
         </div>
         
         <div id="car-viewer">
+            <div id="car-viewer-glow" aria-hidden="true"></div>
             <model-viewer 
                 id="animated-car"
                 src="2024aramidversion2.0029.glb" 
@@ -974,8 +1054,14 @@
             <div class="tier-group platinum reveal">
                 <div class="tier-title">Platinum Partners</div>
                 <div class="sponsor-grid">
-                    <div class="sponsor-card">Sponsor Slot</div>
-                    <div class="sponsor-card">Sponsor Slot</div>
+                    <div class="sponsor-card">
+                        <div class="sponsor-logo-layer">Sponsor Slot</div>
+                        <div class="sponsor-video-layer"><span>▶</span> Placeholder Sponsor Vid</div>
+                    </div>
+                    <div class="sponsor-card">
+                        <div class="sponsor-logo-layer">Sponsor Slot</div>
+                        <div class="sponsor-video-layer"><span>▶</span> Placeholder Sponsor Vid</div>
+                    </div>
                 </div>
             </div>
             <div class="tier-group gold reveal">
@@ -989,7 +1075,6 @@
             <div class="tier-group silver reveal">
                 <div class="tier-title">Silver Partners</div>
                 <div class="sponsor-grid">
-                    <div class="sponsor-card">Partner</div>
                     <div class="sponsor-card">Partner</div>
                     <div class="sponsor-card">Partner</div>
                     <div class="sponsor-card">Partner</div>
@@ -1094,11 +1179,45 @@
             }
         }
 
+        // Dedicated glow-orb population for the car viewer, so orbs stay visible in
+        // Explore Car / fullscreen mode (see #car-viewer-glow CSS comment for why).
+        function initializeCarViewerGlowSystem() {
+            const glowTargetBox = document.getElementById('car-viewer-glow');
+            if (!glowTargetBox) return;
+            glowTargetBox.innerHTML = '';
+
+            const totalGlowPoints = 16;
+
+            for (let i = 0; i < totalGlowPoints; i++) {
+                const node = document.createElement('div');
+                node.classList.add('glow-particle');
+
+                const nodeX = Math.random() * 100;
+                const nodeY = Math.random() * 100;
+
+                const nodeSize = 12 + (Math.random() * 35);
+                const nodeBreatheDuration = 4 + (Math.random() * 5);
+                const nodePhaseOffset = Math.random() * -8;
+
+                node.style.setProperty('--x', `${nodeX}%`);
+                node.style.setProperty('--y', `${nodeY}%`);
+                node.style.setProperty('--size', `${nodeSize}px`);
+                node.style.setProperty('--pulse-duration', `${nodeBreatheDuration}s`);
+                node.style.setProperty('--pulse-delay', `${nodePhaseOffset}s`);
+
+                glowTargetBox.appendChild(node);
+            }
+        }
+
         window.addEventListener('load', initializeGridGlowSystem);
+        window.addEventListener('load', initializeCarViewerGlowSystem);
         let resizeDebounceTimer;
         window.addEventListener('resize', () => {
             clearTimeout(resizeDebounceTimer);
-            resizeDebounceTimer = setTimeout(initializeGridGlowSystem, 250);
+            resizeDebounceTimer = setTimeout(() => {
+                initializeGridGlowSystem();
+                initializeCarViewerGlowSystem();
+            }, 250);
         });
 
         const rootStyle = document.documentElement.style;
