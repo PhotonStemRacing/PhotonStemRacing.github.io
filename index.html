@@ -53,7 +53,7 @@
             background-image: linear-gradient(rgba(255, 235, 0, 0.07) 1px, transparent 1px),
                               linear-gradient(90deg, rgba(255, 235, 0, 0.07) 1px, transparent 1px);
             background-size: 60px 60px;
-            background-position-y: calc(var(--scroll-y) * -0.15);
+            background-position-y: calc(var(--scroll-y) * -0.4);
             z-index: 1;
             pointer-events: none;
         }
@@ -86,17 +86,17 @@
             animation: breatheGlow var(--pulse-duration) ease-in-out infinite alternate;
             animation-delay: var(--pulse-delay);
             will-change: opacity, transform;
-            transform: translateY(calc(var(--scroll-y) * 0.08));
+            transform: translateY(calc(var(--scroll-y) * 0.25));
         }
 
         @keyframes breatheGlow {
             0% {
                 opacity: 0.2;
-                transform: translateY(calc(var(--scroll-y) * 0.08)) scale(0.85);
+                transform: translateY(calc(var(--scroll-y) * 0.25)) scale(0.85);
             }
             100% {
                 opacity: 0.9;
-                transform: translateY(calc(var(--scroll-y) * 0.08)) scale(1.15);
+                transform: translateY(calc(var(--scroll-y) * 0.25)) scale(1.15);
             }
         }
 
@@ -232,7 +232,7 @@
             pointer-events: none;
             transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
             will-change: transform;
-            transform: translateY(calc(var(--scroll-y) * 0.15));
+            transform: translateY(calc(var(--scroll-y) * 0.35));
             box-sizing: border-box;
         }
 
@@ -270,7 +270,7 @@
             flex-direction: column;
             overflow: hidden;
             will-change: transform;
-            transform: translateY(calc(var(--scroll-y) * 0.28));
+            transform: translateY(calc(var(--scroll-y) * 0.55));
         }
 
         model-viewer {
@@ -729,6 +729,139 @@
             background-color: #000000;
             letter-spacing: 1.5px;
         }
+
+        /* ============================
+           RESPONSIVE BREAKPOINTS
+           ============================ */
+        @media (max-width: 900px) {
+            nav {
+                padding: 20px 24px;
+                flex-wrap: wrap;
+                row-gap: 14px;
+            }
+
+            .nav-left-cluster {
+                gap: 15px;
+            }
+
+            nav h1 {
+                font-size: 1.25rem;
+                letter-spacing: 4px;
+            }
+
+            .studio-toggle-btn {
+                padding: 7px 14px;
+                font-size: 0.68rem;
+            }
+
+            nav ul {
+                gap: 8px;
+                flex-wrap: wrap;
+                width: 100%;
+                justify-content: center;
+            }
+
+            nav a {
+                font-size: 0.68rem;
+                padding: 6px 10px;
+            }
+
+            #hero {
+                height: calc(100vh - 130px);
+                min-height: 560px;
+            }
+
+            #hero-text-container {
+                padding-top: 5vh;
+            }
+
+            #hero h2 {
+                font-size: 3.4rem;
+                letter-spacing: 2px;
+            }
+
+            #hero p {
+                font-size: 0.8rem;
+                letter-spacing: 4px;
+            }
+
+            .fullscreen-toggle {
+                left: 20px;
+                bottom: 210px;
+                padding: 10px 16px;
+                font-size: 0.65rem;
+            }
+
+            .viewer-details {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 25px 24px;
+                gap: 18px;
+            }
+
+            .viewer-caption {
+                max-width: 100%;
+                font-size: 0.9rem;
+            }
+
+            .instagram-btn {
+                padding: 12px 22px;
+                font-size: 0.7rem;
+            }
+
+            section {
+                padding: 100px 24px;
+            }
+
+            .section-title {
+                font-size: 1.9rem;
+                letter-spacing: 2px;
+                margin-bottom: 55px;
+            }
+
+            .team-card {
+                width: 100%;
+                max-width: 320px;
+            }
+
+            .portfolio-card {
+                width: 100%;
+                max-width: 340px;
+                padding: 40px 30px;
+            }
+
+            .platinum .sponsor-card { width: 100%; max-width: 320px; height: 150px; }
+            .gold .sponsor-card { width: 100%; max-width: 280px; height: 130px; }
+            .silver .sponsor-card { width: 100%; max-width: 200px; height: 100px; }
+
+            .logo-flex {
+                gap: 45px;
+            }
+
+            .logo-wrapper {
+                width: 180px;
+                height: 85px;
+            }
+
+            .contact-box {
+                padding: 45px 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #hero h2 {
+                font-size: 2.3rem;
+            }
+
+            nav h1 {
+                font-size: 1.05rem;
+                letter-spacing: 2px;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1071,7 +1204,12 @@
                 const targetVertical = 66 + (Math.sin(orbitTimeline * 1.5) * 7); 
                 const targetZoom = 92 + (Math.cos(orbitTimeline * 1.1) * 16); 
                 
-                // 3. Dispatch a single static coordinate change and let the built-in interpolator smoothly glide the viewer back
+                // 3. Reset pan offset and field-of-view back to defaults, in addition to the
+                //    orbit angle/zoom. Manual dragging/scrolling in Explore mode can shift the
+                //    pan target and FOV independently of camera-orbit, so resetting orbit alone
+                //    left the car looking mis-sized or off-center after locking the canvas.
+                carViewer.cameraTarget = 'auto';
+                carViewer.fieldOfView = 'auto';
                 carViewer.cameraOrbit = `${targetHorizontal}deg ${targetVertical}deg ${targetZoom}%`;
                 
                 // 4. Wait 1.8 seconds for the glide to physically complete before flooding it with animation frame updates
@@ -1092,7 +1230,7 @@
                 } else if (viewRenderContainer.webkitRequestFullscreen) { 
                     viewRenderContainer.webkitRequestFullscreen();
                 }
-                fullscreenWidget.innerHTML = '<span>内</span> Close Screen';
+                fullscreenWidget.innerHTML = '<span>✕</span> Close Screen';
             } else {
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
