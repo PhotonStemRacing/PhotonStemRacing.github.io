@@ -50,15 +50,30 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: #060606;
-            /* Woven carbon-fibre crosshatch sits underneath the neon measurement grid */
+            background-color: #0a0a0a;
+            /* Real woven carbon-fibre twill pattern, with a soft diagonal clearcoat sheen
+               pass on top, sits underneath the neon measurement grid */
             background-image:
-                repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.035) 0px, rgba(255, 255, 255, 0.035) 2px, transparent 2px, transparent 7px),
-                repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.5) 0px, rgba(0, 0, 0, 0.5) 2px, rgba(20, 20, 20, 0.5) 2px, rgba(20, 20, 20, 0.5) 7px),
+                linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.045) 47%, transparent 64%),
                 linear-gradient(rgba(255, 235, 0, 0.07) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 235, 0, 0.07) 1px, transparent 1px);
-            background-size: 10px 10px, 10px 10px, 60px 60px, 60px 60px;
-            background-position-y: 0, 0, calc(var(--scroll-y) * -0.4), calc(var(--scroll-y) * -0.4);
+                linear-gradient(90deg, rgba(255, 235, 0, 0.07) 1px, transparent 1px),
+                linear-gradient(27deg, #282828 5px, transparent 5px),
+                linear-gradient(207deg, #282828 5px, transparent 5px),
+                linear-gradient(27deg, #282828 5px, transparent 5px),
+                linear-gradient(207deg, #282828 5px, transparent 5px),
+                linear-gradient(90deg, #1c1c1c 10px, transparent 10px),
+                linear-gradient(#1e1e1e 25%, #2e2e2e 25%, #2e2e2e 50%, #1e1e1e 50%, #1e1e1e 75%, #2e2e2e 75%, #2e2e2e);
+            background-size:
+                100% 100%,
+                60px 60px, 60px 60px,
+                20px 20px, 20px 20px, 20px 20px, 20px 20px,
+                20px 20px, 20px 20px;
+            background-position:
+                0 0,
+                0 calc(var(--scroll-y) * -0.4), 0 calc(var(--scroll-y) * -0.4),
+                0 0, 0 0,
+                10px 10px, 10px 10px,
+                0 0, 0 0;
             z-index: 1;
             pointer-events: none;
         }
@@ -105,7 +120,7 @@
             }
         }
 
-        /* FRACTURED FROSTED GLASS treatment, shared by every card-style box on the page */
+        /* FRACTURED FROSTED GLASS treatment, shared base for every card-style box on the page */
         .team-card,
         .sponsor-card,
         .portfolio-card,
@@ -117,7 +132,7 @@
             -webkit-backdrop-filter: blur(22px) saturate(150%);
         }
 
-        /* Angled cracked-light facets layered across every glass box */
+        /* Every box gets its own fracture pattern rather than one repeated look */
         .team-card::before,
         .sponsor-card::before,
         .portfolio-card::before,
@@ -125,13 +140,62 @@
             content: '';
             position: absolute;
             inset: 0;
-            background-image:
-                linear-gradient(113deg, transparent 22%, rgba(255, 255, 255, 0.05) 23%, transparent 26%),
-                linear-gradient(68deg, transparent 48%, rgba(255, 255, 255, 0.045) 49%, transparent 53%),
-                linear-gradient(158deg, transparent 68%, rgba(255, 255, 255, 0.035) 69%, transparent 73%),
-                linear-gradient(20deg, transparent 85%, rgba(255, 235, 0, 0.04) 86%, transparent 90%);
             pointer-events: none;
             z-index: 1;
+        }
+
+        /* Team cards: tight, steep diagonal shards */
+        .team-card::before {
+            background-image:
+                linear-gradient(125deg, transparent 15%, rgba(255, 255, 255, 0.06) 16%, transparent 19%),
+                linear-gradient(80deg, transparent 40%, rgba(255, 255, 255, 0.05) 41%, transparent 45%),
+                linear-gradient(155deg, transparent 60%, rgba(255, 255, 255, 0.04) 61%, transparent 65%),
+                linear-gradient(35deg, transparent 82%, rgba(255, 235, 0, 0.045) 83%, transparent 87%);
+        }
+
+        /* Sponsor cards: flatter, more horizontal cracks suited to a wide box */
+        .sponsor-card::before {
+            background-image:
+                linear-gradient(100deg, transparent 18%, rgba(255, 255, 255, 0.06) 19%, transparent 23%),
+                linear-gradient(12deg, transparent 48%, rgba(255, 255, 255, 0.045) 49%, transparent 54%),
+                linear-gradient(165deg, transparent 74%, rgba(255, 235, 0, 0.04) 75%, transparent 80%);
+        }
+
+        /* Portfolio cards: bigger, bolder shards */
+        .portfolio-card::before {
+            background-image:
+                linear-gradient(140deg, transparent 10%, rgba(255, 255, 255, 0.07) 11%, transparent 15%),
+                linear-gradient(50deg, transparent 45%, rgba(255, 255, 255, 0.05) 46%, transparent 51%),
+                linear-gradient(175deg, transparent 70%, rgba(255, 235, 0, 0.05) 71%, transparent 76%),
+                linear-gradient(95deg, transparent 88%, rgba(255, 255, 255, 0.045) 89%, transparent 93%);
+        }
+
+        /* Contact box: a single impact point with radiating cracks, since it's the one CTA on the page */
+        .contact-box::before {
+            background-image:
+                conic-gradient(from 20deg at 50% 40%,
+                    transparent 0deg, rgba(255, 255, 255, 0.05) 2deg, transparent 4deg,
+                    transparent 55deg, rgba(255, 255, 255, 0.045) 57deg, transparent 59deg,
+                    transparent 120deg, rgba(255, 235, 0, 0.05) 122deg, transparent 124deg,
+                    transparent 200deg, rgba(255, 255, 255, 0.04) 202deg, transparent 204deg,
+                    transparent 260deg, rgba(255, 255, 255, 0.045) 262deg, transparent 264deg,
+                    transparent 330deg, rgba(255, 235, 0, 0.04) 332deg, transparent 334deg,
+                    transparent 360deg);
+        }
+
+        /* Bridges the hard seam where the hero's bottom fade used to cut straight to black
+           right as the Team Roles section began. Negative margins let it overlap both
+           neighbours without pushing later content down the page. */
+        .hero-team-fade-bridge {
+            position: relative;
+            z-index: 5;
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            height: 360px;
+            margin-top: -360px;
+            margin-bottom: -360px;
+            background: linear-gradient(to bottom, rgba(8, 8, 8, 0.92) 0%, rgba(8, 8, 8, 0.5) 45%, transparent 100%);
+            pointer-events: none;
         }
 
         /* Scroll Animation Reveal Targets */
@@ -378,7 +442,7 @@
             left: 0;
             width: 100%;
             padding: 45px 60px;
-            background: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.8) 70%, transparent 100%);
+            background: linear-gradient(to top, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 0.75) 55%, transparent 100%);
             border-top: none;
             text-align: left;
             z-index: 20;
@@ -634,12 +698,22 @@
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(255, 235, 0, 0.03) 100%);
             color: #777777;
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-direction: column;
+            gap: 10px;
         }
 
-        /* After 5 continuous seconds of hover, the logo slides left to reveal the video layer */
+        .sponsor-logo-layer .sponsor-hover-caption {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--primary-yellow);
+            opacity: 0.75;
+        }
+
+        /* After 3 continuous seconds of hover, the logo slides left to reveal the video layer */
         .platinum .sponsor-card:hover .sponsor-logo-layer {
             transform: translateX(-100%);
-            transition-delay: 5s;
+            transition-delay: 3s;
         }
 
         .sponsor-video-layer {
@@ -718,18 +792,33 @@
         }
 
         .contact-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border: 1px solid rgba(255, 235, 0, 0.2);
             border-radius: 12px;
-            padding: 70px 50px;
+            padding: 90px 50px;
             box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 235, 0, 0.05);
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s, border-color 0.4s;
         }
 
-        .contact-box p {
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.85);
-            line-height: 1.8;
-            margin: 0 0 45px 0;
-            letter-spacing: 0.3px;
+        .contact-box span {
+            position: relative;
+            z-index: 2;
+            color: var(--primary-yellow);
+            font-size: 1.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 25px rgba(255, 235, 0, 0.35);
+        }
+
+        .contact-box:hover {
+            transform: scale(1.03);
+            border-color: var(--primary-yellow);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), 0 0 45px rgba(255, 235, 0, 0.25);
         }
 
         .institutional-logos {
@@ -995,6 +1084,10 @@
         </div>
     </header>
 
+    <!-- Bridges the hero's bottom fade smoothly into the Team Roles section, instead of the
+         hero cutting off and the section's carbon-fibre texture starting abruptly right after it -->
+    <div class="hero-team-fade-bridge" aria-hidden="true"></div>
+
     <!-- Team Roles Section -->
     <section id="team">
         <h3 class="section-title reveal">Team Roles</h3>
@@ -1055,11 +1148,17 @@
                 <div class="tier-title">Platinum Partners</div>
                 <div class="sponsor-grid">
                     <div class="sponsor-card">
-                        <div class="sponsor-logo-layer">Sponsor Slot</div>
+                        <div class="sponsor-logo-layer">
+                            <span>Sponsor Slot</span>
+                            <span class="sponsor-hover-caption">Hover to view video</span>
+                        </div>
                         <div class="sponsor-video-layer"><span>▶</span> Placeholder Sponsor Vid</div>
                     </div>
                     <div class="sponsor-card">
-                        <div class="sponsor-logo-layer">Sponsor Slot</div>
+                        <div class="sponsor-logo-layer">
+                            <span>Sponsor Slot</span>
+                            <span class="sponsor-hover-caption">Hover to view video</span>
+                        </div>
                         <div class="sponsor-video-layer"><span>▶</span> Placeholder Sponsor Vid</div>
                     </div>
                 </div>
@@ -1102,11 +1201,10 @@
 
     <!-- Dedicated Interactive Contact Section -->
     <section id="contact">
-        <h3 class="section-title reveal">Connect With Us</h3>
-        <div class="contact-box reveal">
-            <p>Interested in supporting our journey? Contact us here for corporate sponsorship enquiries, corporate partnerships, or general team questions. Launch an immediate connection link below.</p>
-            <a href="mailto:Photonstemracing@gmail.com?subject=Photon%20Sponsorship%20Enquiry" class="btn">Launch Email App</a>
-        </div>
+        <h3 class="section-title reveal">Contact Us</h3>
+        <a href="mailto:Photonstemracing@gmail.com?subject=Photon%20Sponsorship%20Enquiry" class="contact-box reveal">
+            <span>Contact Us</span>
+        </a>
     </section>
 
     <!-- Affiliated Institutional Logos Section -->
