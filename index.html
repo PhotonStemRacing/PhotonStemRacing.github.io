@@ -40,6 +40,7 @@
             --glass-tint-2: rgba(255, 255, 255, 0.015);
             --glass-border: rgba(255, 235, 0, 0.1);
             --footer-bg: #000000;
+            --grid-line-color: rgba(255, 235, 0, 0.07);
             
             /* High-performance scroll coordinate tracking primitive */
             --scroll-y: 0px;
@@ -57,6 +58,12 @@
             --footer-bg: #eceae4;
             --card-bg: rgba(255, 255, 255, 0.55);
             --text-light: #141414;
+            --text-muted: #55534e;
+            /* Pure neon yellow reads poorly against a light background, so light mode
+               uses a much darker, more saturated amber for the accent everywhere
+               var(--primary-yellow) is used, keeping real contrast against white/cream. */
+            --primary-yellow: #9c6d00;
+            --grid-line-color: rgba(120, 90, 0, 0.16);
         }
 
         html {
@@ -86,8 +93,8 @@
             width: 100vw;
             height: calc(100vh + 300px);
             background-color: var(--bg-grid);
-            background-image: linear-gradient(rgba(255, 235, 0, 0.07) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255, 235, 0, 0.07) 1px, transparent 1px);
+            background-image: linear-gradient(var(--grid-line-color) 1px, transparent 1px),
+                              linear-gradient(90deg, var(--grid-line-color) 1px, transparent 1px);
             background-size: 60px 60px;
             /* Parallax now driven by transform (compositor-only) instead of background-position,
                which forced a full repaint of this layer on every scroll frame and was a big
@@ -217,8 +224,10 @@
         }
 
         /* Bridges the hard seam where the hero's bottom fade used to cut straight to black
-           right as the Team Roles section began. Negative margins let it overlap both
-           neighbours without pushing later content down the page. */
+           right as the Team Roles section began. Negative margin-top lets it overlap the
+           tail of the hero without pushing anything down; NOT setting a negative
+           margin-bottom too (a previous bug) is important -- that had been dragging the
+           whole Team Roles section up on top of the hero/car. */
         .hero-team-fade-bridge {
             position: relative;
             z-index: 5;
@@ -226,7 +235,6 @@
             margin-left: calc(50% - 50vw);
             height: 360px;
             margin-top: -360px;
-            margin-bottom: -360px;
             background: linear-gradient(to bottom, rgba(8, 8, 8, 0.92) 0%, rgba(8, 8, 8, 0.5) 45%, transparent 100%);
             pointer-events: none;
         }
@@ -412,7 +420,7 @@
         #hero p {
             font-size: 1.2rem;
             font-weight: 400;
-            color: #ffffff;
+            color: var(--page-text);
             letter-spacing: 8px;
             text-transform: uppercase;
             margin: 0;
@@ -763,11 +771,16 @@
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(255, 235, 0, 0.03) 100%);
             color: #777777;
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            flex-direction: column;
-            gap: 10px;
         }
 
+        /* Pinned to the bottom of the card as a caption, rather than stacked under the
+           main label in the middle */
         .sponsor-logo-layer .sponsor-hover-caption {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 14px;
+            text-align: center;
             font-size: 0.65rem;
             font-weight: 700;
             letter-spacing: 2px;
@@ -959,7 +972,7 @@
             text-transform: uppercase;
             font-weight: 700;
             letter-spacing: 2px;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--page-text-muted);
         }
 
         footer {
@@ -1169,13 +1182,18 @@
         }
 
         .constellation-hint {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            right: 0;
+            z-index: 2;
             color: #cccccc;
             letter-spacing: 1px;
-            margin-bottom: 30px;
             text-align: center;
             font-size: 0.85rem;
             text-transform: uppercase;
             line-height: 1.8;
+            pointer-events: none;
         }
 
         .constellation-hint span {
@@ -1185,12 +1203,9 @@
         }
 
         #constellation-stage {
-            position: relative;
-            width: min(600px, 88vw);
-            height: min(600px, 60vh);
-            border: 1px solid rgba(255, 235, 0, 0.15);
-            border-radius: 12px;
-            background: radial-gradient(circle at 50% 40%, rgba(255, 235, 0, 0.04), transparent 70%);
+            position: absolute;
+            inset: 0;
+            z-index: 1;
             touch-action: none;
         }
 
@@ -1505,12 +1520,12 @@
 
     <div id="constellation-overlay" class="hidden-overlay">
         <button id="constellation-close" class="overlay-close-btn">✕</button>
-        <p class="constellation-hint">Drag the orbs to make a constellation.<br>Form the shape of <span>Γ</span> (gamma) to unlock something.</p>
+        <p class="constellation-hint">Drag the orbs to make a constellation.<br>Form the shape of <span>γ</span> (gamma) to unlock something.</p>
         <div id="constellation-stage">
             <svg id="constellation-lines"></svg>
-            <div class="gamma-target" style="left:30%;top:22%;"></div>
-            <div class="gamma-target" style="left:68%;top:22%;"></div>
-            <div class="gamma-target" style="left:30%;top:78%;"></div>
+            <div class="gamma-target" style="left:70%;top:20%;"></div>
+            <div class="gamma-target" style="left:27%;top:32%;"></div>
+            <div class="gamma-target" style="left:48%;top:82%;"></div>
         </div>
     </div>
 
@@ -1805,12 +1820,13 @@
 
             if (!trigger || !overlay || !stage) return;
 
-            // Target points sketch out a capital Gamma (Γ): a horizontal top stroke
-            // plus a vertical stroke down from its left end.
+            // Target points sketch out the lowercase gamma (γ) glyph: a long diagonal
+            // stroke from the top-right down to a bottom vertex, plus a shorter hooked
+            // stroke joining in from the top-left -- both meeting at that bottom point.
             const gammaTargets = [
-                { x: 30, y: 22 },
-                { x: 68, y: 22 },
-                { x: 30, y: 78 }
+                { x: 70, y: 20 }, // top-right, start of the long diagonal
+                { x: 27, y: 32 }, // top-left hook
+                { x: 48, y: 82 }  // bottom vertex where both strokes meet
             ];
 
             let orbs = [];
@@ -1910,15 +1926,15 @@
             }
 
             function drawGammaLines(keyOrbs) {
-                const a = keyOrbs.find((o) => o.dataset.targetIndex === '0');
-                const b = keyOrbs.find((o) => o.dataset.targetIndex === '1');
-                const c = keyOrbs.find((o) => o.dataset.targetIndex === '2');
-                const pa = { x: parseFloat(a.dataset.x), y: parseFloat(a.dataset.y) };
-                const pb = { x: parseFloat(b.dataset.x), y: parseFloat(b.dataset.y) };
-                const pc = { x: parseFloat(c.dataset.x), y: parseFloat(c.dataset.y) };
+                const topRight = keyOrbs.find((o) => o.dataset.targetIndex === '0');
+                const topLeftHook = keyOrbs.find((o) => o.dataset.targetIndex === '1');
+                const bottomVertex = keyOrbs.find((o) => o.dataset.targetIndex === '2');
+                const pTopRight = { x: parseFloat(topRight.dataset.x), y: parseFloat(topRight.dataset.y) };
+                const pHook = { x: parseFloat(topLeftHook.dataset.x), y: parseFloat(topLeftHook.dataset.y) };
+                const pBottom = { x: parseFloat(bottomVertex.dataset.x), y: parseFloat(bottomVertex.dataset.y) };
                 svgLines.innerHTML += `
-                    <line x1="${pa.x}%" y1="${pa.y}%" x2="${pb.x}%" y2="${pb.y}%" stroke="rgba(255,235,0,0.9)" stroke-width="3" />
-                    <line x1="${pa.x}%" y1="${pa.y}%" x2="${pc.x}%" y2="${pc.y}%" stroke="rgba(255,235,0,0.9)" stroke-width="3" />
+                    <line x1="${pTopRight.x}%" y1="${pTopRight.y}%" x2="${pBottom.x}%" y2="${pBottom.y}%" stroke="rgba(255,235,0,0.9)" stroke-width="3" />
+                    <line x1="${pHook.x}%" y1="${pHook.y}%" x2="${pBottom.x}%" y2="${pBottom.y}%" stroke="rgba(255,235,0,0.9)" stroke-width="3" />
                 `;
             }
 
