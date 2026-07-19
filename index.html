@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Photon | STEM Team</title>
+
+    <!-- Applied before first paint so there's no flash of the wrong theme -->
+    <script>
+        try {
+            if (localStorage.getItem('photon-theme') === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        } catch (e) { /* localStorage unavailable, default (dark) stands */ }
+    </script>
     
     <!-- Link to the custom tab icon -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -20,25 +29,51 @@
             --text-light: #ffffff;
             --text-muted: #aaaaaa;
             --text-dark: #000000;
+
+            /* Theme-aware tokens: dark is the default */
+            --bg-main: #000000;
+            --bg-grid: #050505;
+            --nav-bg: rgba(0, 0, 0, 0.95);
+            --page-text: #ffffff;
+            --page-text-muted: #aaaaaa;
+            --glass-tint-1: rgba(255, 255, 255, 0.07);
+            --glass-tint-2: rgba(255, 255, 255, 0.015);
+            --glass-border: rgba(255, 235, 0, 0.1);
+            --footer-bg: #000000;
             
             /* High-performance scroll coordinate tracking primitive */
             --scroll-y: 0px;
         }
 
+        [data-theme="light"] {
+            --bg-main: #f4f3ef;
+            --bg-grid: #eceae4;
+            --nav-bg: rgba(244, 243, 239, 0.92);
+            --page-text: #141414;
+            --page-text-muted: #55534e;
+            --glass-tint-1: rgba(0, 0, 0, 0.05);
+            --glass-tint-2: rgba(255, 255, 255, 0.35);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --footer-bg: #eceae4;
+            --card-bg: rgba(255, 255, 255, 0.55);
+            --text-light: #141414;
+        }
+
         html {
             scroll-behavior: smooth;
-            background-color: var(--deep-black);
+            background-color: var(--bg-main);
         }
 
         body {
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-            background-color: var(--deep-black);
-            color: var(--text-light);
+            background-color: var(--bg-main);
+            color: var(--page-text);
             overflow-x: hidden;
             letter-spacing: 0.5px;
             position: relative;
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
 
         /* PARALLAX LAYER 1: Cyber Grid Matrix 
@@ -46,19 +81,19 @@
         */
         #bg-grid-overlay {
             position: fixed;
-            top: 0;
+            top: -150px;
             left: 0;
             width: 100vw;
-            height: 100vh;
-            background-color: #060606;
-            /* Woven carbon-fibre crosshatch sits underneath the neon measurement grid */
-            background-image:
-                repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.035) 0px, rgba(255, 255, 255, 0.035) 2px, transparent 2px, transparent 7px),
-                repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.5) 0px, rgba(0, 0, 0, 0.5) 2px, rgba(20, 20, 20, 0.5) 2px, rgba(20, 20, 20, 0.5) 7px),
-                linear-gradient(rgba(255, 235, 0, 0.07) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 235, 0, 0.07) 1px, transparent 1px);
-            background-size: 10px 10px, 10px 10px, 60px 60px, 60px 60px;
-            background-position-y: 0, 0, calc(var(--scroll-y) * -0.4), calc(var(--scroll-y) * -0.4);
+            height: calc(100vh + 300px);
+            background-color: var(--bg-grid);
+            background-image: linear-gradient(rgba(255, 235, 0, 0.07) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 235, 0, 0.07) 1px, transparent 1px);
+            background-size: 60px 60px;
+            /* Parallax now driven by transform (compositor-only) instead of background-position,
+               which forced a full repaint of this layer on every scroll frame and was a big
+               contributor to scroll jitter, especially noticeable over the hero/car area. */
+            transform: translateY(calc(var(--scroll-y) * -0.25));
+            will-change: transform;
             z-index: 1;
             pointer-events: none;
         }
@@ -105,46 +140,119 @@
             }
         }
 
-        /* FRACTURED FROSTED GLASS treatment, shared by every card-style box on the page */
+        /* FRACTURED FROSTED GLASS treatment, shared base for every card-style box on the page */
         .team-card,
         .sponsor-card,
         .portfolio-card,
-        .contact-box {
+        .contact-box,
+        .logo-wrapper {
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 45%, rgba(255, 235, 0, 0.035) 75%, rgba(255, 255, 255, 0.05) 100%);
-            backdrop-filter: blur(22px) saturate(150%);
-            -webkit-backdrop-filter: blur(22px) saturate(150%);
+            background: linear-gradient(135deg, var(--glass-tint-1) 0%, var(--glass-tint-2) 45%, rgba(255, 235, 0, 0.035) 75%, var(--glass-tint-1) 100%);
+            /* Lighter blur than before: heavy backdrop-filter blur is one of the most
+               expensive things a browser repaints, and with this many glass boxes on
+               screen it was a real contributor to scroll jank. 12px keeps the frosted
+               look with far less cost. */
+            backdrop-filter: blur(12px) saturate(140%);
+            -webkit-backdrop-filter: blur(12px) saturate(140%);
         }
 
-        /* Angled cracked-light facets layered across every glass box */
+        /* Every box gets its own fracture pattern rather than one repeated look */
         .team-card::before,
         .sponsor-card::before,
         .portfolio-card::before,
-        .contact-box::before {
+        .contact-box::before,
+        .logo-wrapper::before {
             content: '';
             position: absolute;
             inset: 0;
-            background-image:
-                linear-gradient(113deg, transparent 22%, rgba(255, 255, 255, 0.05) 23%, transparent 26%),
-                linear-gradient(68deg, transparent 48%, rgba(255, 255, 255, 0.045) 49%, transparent 53%),
-                linear-gradient(158deg, transparent 68%, rgba(255, 255, 255, 0.035) 69%, transparent 73%),
-                linear-gradient(20deg, transparent 85%, rgba(255, 235, 0, 0.04) 86%, transparent 90%);
             pointer-events: none;
             z-index: 1;
+        }
+
+        /* Team cards: tight, steep diagonal shards */
+        .team-card::before {
+            background-image:
+                linear-gradient(125deg, transparent 15%, rgba(255, 255, 255, 0.06) 16%, transparent 19%),
+                linear-gradient(80deg, transparent 40%, rgba(255, 255, 255, 0.05) 41%, transparent 45%),
+                linear-gradient(155deg, transparent 60%, rgba(255, 255, 255, 0.04) 61%, transparent 65%),
+                linear-gradient(35deg, transparent 82%, rgba(255, 235, 0, 0.045) 83%, transparent 87%);
+        }
+
+        /* Sponsor cards: flatter, more horizontal cracks suited to a wide box */
+        .sponsor-card::before {
+            background-image:
+                linear-gradient(100deg, transparent 18%, rgba(255, 255, 255, 0.06) 19%, transparent 23%),
+                linear-gradient(12deg, transparent 48%, rgba(255, 255, 255, 0.045) 49%, transparent 54%),
+                linear-gradient(165deg, transparent 74%, rgba(255, 235, 0, 0.04) 75%, transparent 80%);
+        }
+
+        /* Portfolio cards: bigger, bolder shards */
+        .portfolio-card::before {
+            background-image:
+                linear-gradient(140deg, transparent 10%, rgba(255, 255, 255, 0.07) 11%, transparent 15%),
+                linear-gradient(50deg, transparent 45%, rgba(255, 255, 255, 0.05) 46%, transparent 51%),
+                linear-gradient(175deg, transparent 70%, rgba(255, 235, 0, 0.05) 71%, transparent 76%),
+                linear-gradient(95deg, transparent 88%, rgba(255, 255, 255, 0.045) 89%, transparent 93%);
+        }
+
+        /* Contact box: a single impact point with radiating cracks, since it's the one CTA on the page */
+        .contact-box::before {
+            background-image:
+                conic-gradient(from 20deg at 50% 40%,
+                    transparent 0deg, rgba(255, 255, 255, 0.05) 2deg, transparent 4deg,
+                    transparent 55deg, rgba(255, 255, 255, 0.045) 57deg, transparent 59deg,
+                    transparent 120deg, rgba(255, 235, 0, 0.05) 122deg, transparent 124deg,
+                    transparent 200deg, rgba(255, 255, 255, 0.04) 202deg, transparent 204deg,
+                    transparent 260deg, rgba(255, 255, 255, 0.045) 262deg, transparent 264deg,
+                    transparent 330deg, rgba(255, 235, 0, 0.04) 332deg, transparent 334deg,
+                    transparent 360deg);
+        }
+
+        /* Affiliated entity logos: subtle, light shards so the logos stay clearly legible */
+        .logo-wrapper::before {
+            background-image:
+                linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.05) 31%, transparent 35%),
+                linear-gradient(60deg, transparent 68%, rgba(255, 235, 0, 0.04) 69%, transparent 74%);
+        }
+
+        /* Bridges the hard seam where the hero's bottom fade used to cut straight to black
+           right as the Team Roles section began. Negative margins let it overlap both
+           neighbours without pushing later content down the page. */
+        .hero-team-fade-bridge {
+            position: relative;
+            z-index: 5;
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            height: 360px;
+            margin-top: -360px;
+            margin-bottom: -360px;
+            background: linear-gradient(to bottom, rgba(8, 8, 8, 0.92) 0%, rgba(8, 8, 8, 0.5) 45%, transparent 100%);
+            pointer-events: none;
         }
 
         /* Scroll Animation Reveal Targets */
         .reveal {
             opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 1s cubic-bezier(0.215, 0.610, 0.355, 1), 
-                        transform 1s cubic-bezier(0.215, 0.610, 0.355, 1);
+            transform: translateY(55px) scale(0.94);
+            filter: blur(6px);
+            transition: opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1), 
+                        transform 1.1s cubic-bezier(0.16, 1, 0.3, 1),
+                        filter 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform, filter;
         }
 
         .reveal.active {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
+            filter: blur(0px);
+        }
+
+        /* Cinematic hero entrance on first paint (opacity/filter only, so it never fights
+           the scroll-driven parallax transform already applied to these elements) */
+        @keyframes heroIntroFade {
+            0% { opacity: 0; filter: blur(14px); }
+            100% { opacity: 1; filter: blur(0px); }
         }
 
         /* Navigation Structure */
@@ -153,13 +261,14 @@
             justify-content: space-between;
             align-items: center;
             padding: 30px 60px;
-            background-color: rgba(0, 0, 0, 0.95); 
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px); 
+            background-color: var(--nav-bg); 
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px); 
             border-bottom: 1px solid rgba(255, 235, 0, 0.15);
             position: sticky;
             top: 0;
             z-index: 100;
+            transition: background-color 0.5s ease;
         }
 
         .nav-left-cluster {
@@ -206,6 +315,25 @@
             color: #000000;
             border-color: var(--primary-yellow);
             box-shadow: 0 0 20px rgba(255, 235, 0, 0.4);
+        }
+
+        .theme-toggle-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 235, 0, 0.35);
+            color: var(--primary-yellow);
+            padding: 7px 16px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.35s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 235, 0, 0.1);
+            box-shadow: 0 0 12px rgba(255, 235, 0, 0.25);
         }
 
         nav ul {
@@ -268,6 +396,7 @@
             will-change: transform;
             transform: translateY(calc(var(--scroll-y) * 0.35));
             box-sizing: border-box;
+            animation: heroIntroFade 1.6s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
         #hero h2 {
@@ -378,7 +507,7 @@
             left: 0;
             width: 100%;
             padding: 45px 60px;
-            background: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.8) 70%, transparent 100%);
+            background: linear-gradient(to top, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 0.75) 55%, transparent 100%);
             border-top: none;
             text-align: left;
             z-index: 20;
@@ -634,12 +763,22 @@
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(255, 235, 0, 0.03) 100%);
             color: #777777;
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-direction: column;
+            gap: 10px;
         }
 
-        /* After 5 continuous seconds of hover, the logo slides left to reveal the video layer */
+        .sponsor-logo-layer .sponsor-hover-caption {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--primary-yellow);
+            opacity: 0.75;
+        }
+
+        /* After 3 continuous seconds of hover, the logo slides left to reveal the video layer */
         .platinum .sponsor-card:hover .sponsor-logo-layer {
             transform: translateX(-100%);
-            transition-delay: 5s;
+            transition-delay: 3s;
         }
 
         .sponsor-video-layer {
@@ -718,29 +857,45 @@
         }
 
         .contact-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border: 1px solid rgba(255, 235, 0, 0.2);
             border-radius: 12px;
-            padding: 70px 50px;
+            padding: 90px 50px;
             box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 235, 0, 0.05);
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s, border-color 0.4s;
         }
 
-        .contact-box p {
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.85);
-            line-height: 1.8;
-            margin: 0 0 45px 0;
-            letter-spacing: 0.3px;
+        .contact-box span {
+            position: relative;
+            z-index: 2;
+            color: var(--primary-yellow);
+            font-size: 1.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 25px rgba(255, 235, 0, 0.35);
+        }
+
+        .contact-box:hover {
+            transform: scale(1.03);
+            border-color: var(--primary-yellow);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), 0 0 45px rgba(255, 235, 0, 0.25);
         }
 
         .institutional-logos {
             position: relative;
             z-index: 35;
             border-top: 1px solid rgba(255, 235, 0, 0.1);
-            background-color: rgba(2, 2, 2, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background-color: var(--nav-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             padding: 80px 20px;
             text-align: center;
+            transition: background-color 0.5s ease;
         }
 
         .institutional-logos h5 {
@@ -779,6 +934,16 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 20px;
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.4s, box-shadow 0.4s;
+        }
+
+        .logo-item:hover .logo-wrapper {
+            border-color: rgba(255, 235, 0, 0.4);
+            box-shadow: 0 0 20px rgba(255, 235, 0, 0.12);
         }
 
         .logo-wrapper img {
@@ -803,10 +968,11 @@
             text-align: center;
             padding: 50px 20px;
             font-size: 0.8rem;
-            color: #555555;
+            color: var(--page-text-muted);
             border-top: 1px solid rgba(255, 235, 0, 0.1);
-            background-color: #000000;
+            background-color: var(--footer-bg);
             letter-spacing: 1.5px;
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
 
         /* ============================
@@ -941,6 +1107,198 @@
                 font-size: 1.5rem;
             }
         }
+
+        /* ================= EASTER EGG: Constellation mini-game ================= */
+        #constellation-trigger {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 500;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: rgba(10, 10, 10, 0.85);
+            border: 1px solid rgba(255, 235, 0, 0.4);
+            color: var(--primary-yellow);
+            font-size: 1.3rem;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 235, 0, 0.25);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #constellation-trigger:hover {
+            transform: scale(1.12);
+            box-shadow: 0 0 26px rgba(255, 235, 0, 0.5);
+        }
+
+        .hidden-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        .hidden-overlay.visible-overlay {
+            display: flex;
+        }
+
+        .overlay-close-btn {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .overlay-close-btn:hover {
+            border-color: var(--primary-yellow);
+            color: var(--primary-yellow);
+        }
+
+        .constellation-hint {
+            color: #cccccc;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            line-height: 1.8;
+        }
+
+        .constellation-hint span {
+            color: var(--primary-yellow);
+            font-weight: 900;
+            font-size: 1.2rem;
+        }
+
+        #constellation-stage {
+            position: relative;
+            width: min(600px, 88vw);
+            height: min(600px, 60vh);
+            border: 1px solid rgba(255, 235, 0, 0.15);
+            border-radius: 12px;
+            background: radial-gradient(circle at 50% 40%, rgba(255, 235, 0, 0.04), transparent 70%);
+            touch-action: none;
+        }
+
+        #constellation-lines {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .gamma-target {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border: 1px dashed rgba(255, 235, 0, 0.35);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .constellation-orb {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--primary-yellow);
+            box-shadow: 0 0 15px 6px rgba(255, 235, 0, 0.55), 0 0 35px 14px rgba(255, 235, 0, 0.25);
+            transform: translate(-50%, -50%);
+            cursor: grab;
+            touch-action: none;
+        }
+
+        .constellation-orb:active {
+            cursor: grabbing;
+        }
+
+        .gamma-success-flash {
+            animation: gammaFlash 1.3s ease;
+        }
+
+        @keyframes gammaFlash {
+            0%, 100% { box-shadow: 0 0 15px 6px rgba(255, 235, 0, 0.55), 0 0 35px 14px rgba(255, 235, 0, 0.25); }
+            50% { box-shadow: 0 0 35px 16px rgba(255, 235, 0, 0.95), 0 0 80px 32px rgba(255, 235, 0, 0.55); }
+        }
+
+        /* Secret PHOTON reveal page */
+        .secret-photon-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .secret-photon-text {
+            font-size: clamp(3rem, 14vw, 11rem);
+            font-weight: 900;
+            letter-spacing: 10px;
+            color: var(--primary-yellow);
+            margin: 0;
+            text-shadow: 0 0 20px rgba(255, 235, 0, 0.8), 0 0 60px rgba(255, 235, 0, 0.6), 0 0 120px rgba(255, 235, 0, 0.4);
+            animation: photonPulse 2.4s ease-in-out infinite, photonShake 6s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes photonPulse {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 20px rgba(255, 235, 0, 0.8), 0 0 60px rgba(255, 235, 0, 0.6), 0 0 120px rgba(255, 235, 0, 0.4); }
+            50% { transform: scale(1.06); text-shadow: 0 0 45px rgba(255, 235, 0, 1), 0 0 110px rgba(255, 235, 0, 0.85), 0 0 220px rgba(255, 235, 0, 0.6); }
+        }
+
+        @keyframes photonShake {
+            0%, 100% { letter-spacing: 10px; }
+            50% { letter-spacing: 17px; }
+        }
+
+        .secret-photon-glow-ring {
+            position: absolute;
+            width: 140%;
+            height: 300%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: conic-gradient(from 0deg, rgba(255, 235, 0, 0) 0%, rgba(255, 235, 0, 0.3) 12%, rgba(255, 235, 0, 0) 28%);
+            animation: ringSpin 7s linear infinite;
+            z-index: 1;
+            filter: blur(35px);
+            pointer-events: none;
+        }
+
+        .secret-photon-glow-ring-2 {
+            animation-duration: 11s;
+            animation-direction: reverse;
+            opacity: 0.6;
+        }
+
+        @keyframes ringSpin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .secret-photon-caption {
+            margin-top: 40px;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 8px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -959,6 +1317,7 @@
             <li><a href="#sponsors">Partners</a></li>
             <li><a href="#portfolios">Docs</a></li>
             <li><a href="#contact">Contact</a></li>
+            <li><button class="theme-toggle-btn" id="theme-toggle" title="Toggle light/dark mode">☾ Dark</button></li>
         </ul>
     </nav>
 
@@ -994,6 +1353,10 @@
             </div>
         </div>
     </header>
+
+    <!-- Bridges the hero's bottom fade smoothly into the Team Roles section, instead of the
+         hero cutting off and the section's carbon-fibre texture starting abruptly right after it -->
+    <div class="hero-team-fade-bridge" aria-hidden="true"></div>
 
     <!-- Team Roles Section -->
     <section id="team">
@@ -1055,11 +1418,17 @@
                 <div class="tier-title">Platinum Partners</div>
                 <div class="sponsor-grid">
                     <div class="sponsor-card">
-                        <div class="sponsor-logo-layer">Sponsor Slot</div>
+                        <div class="sponsor-logo-layer">
+                            <span>Sponsor Slot</span>
+                            <span class="sponsor-hover-caption">Hover to view video</span>
+                        </div>
                         <div class="sponsor-video-layer"><span>▶</span> Placeholder Sponsor Vid</div>
                     </div>
                     <div class="sponsor-card">
-                        <div class="sponsor-logo-layer">Sponsor Slot</div>
+                        <div class="sponsor-logo-layer">
+                            <span>Sponsor Slot</span>
+                            <span class="sponsor-hover-caption">Hover to view video</span>
+                        </div>
                         <div class="sponsor-video-layer"><span>▶</span> Placeholder Sponsor Vid</div>
                     </div>
                 </div>
@@ -1102,11 +1471,10 @@
 
     <!-- Dedicated Interactive Contact Section -->
     <section id="contact">
-        <h3 class="section-title reveal">Connect With Us</h3>
-        <div class="contact-box reveal">
-            <p>Interested in supporting our journey? Contact us here for corporate sponsorship enquiries, corporate partnerships, or general team questions. Launch an immediate connection link below.</p>
-            <a href="mailto:Photonstemracing@gmail.com?subject=Photon%20Sponsorship%20Enquiry" class="btn">Launch Email App</a>
-        </div>
+        <h3 class="section-title reveal">Contact Us</h3>
+        <a href="mailto:Photonstemracing@gmail.com?subject=Photon%20Sponsorship%20Enquiry" class="contact-box reveal">
+            <span>Contact Us</span>
+        </a>
     </section>
 
     <!-- Affiliated Institutional Logos Section -->
@@ -1132,6 +1500,30 @@
         <p>&copy; 2026 PHOTON. ALL RIGHTS RESERVED.</p>
     </footer>
 
+    <!-- ================= EASTER EGG: Constellation mini-game ================= -->
+    <button id="constellation-trigger" title="A little secret...">✦</button>
+
+    <div id="constellation-overlay" class="hidden-overlay">
+        <button id="constellation-close" class="overlay-close-btn">✕</button>
+        <p class="constellation-hint">Drag the orbs to make a constellation.<br>Form the shape of <span>Γ</span> (gamma) to unlock something.</p>
+        <div id="constellation-stage">
+            <svg id="constellation-lines"></svg>
+            <div class="gamma-target" style="left:30%;top:22%;"></div>
+            <div class="gamma-target" style="left:68%;top:22%;"></div>
+            <div class="gamma-target" style="left:30%;top:78%;"></div>
+        </div>
+    </div>
+
+    <div id="secret-page-overlay" class="hidden-overlay">
+        <button id="secret-close" class="overlay-close-btn">✕</button>
+        <div class="secret-photon-wrap">
+            <div class="secret-photon-glow-ring"></div>
+            <div class="secret-photon-glow-ring secret-photon-glow-ring-2"></div>
+            <h1 class="secret-photon-text">PHOTON</h1>
+        </div>
+        <p class="secret-photon-caption">AT THE SPEED OF LIGHT</p>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
@@ -1142,6 +1534,26 @@
             history.replaceState("", document.title, window.location.pathname + window.location.search);
         }
         window.scrollTo(0, 0);
+
+        // Light/Dark theme toggle (dark is the default)
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        function syncThemeButtonLabel() {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            themeToggleBtn.textContent = isLight ? '☀ Light' : '☾ Dark';
+        }
+        syncThemeButtonLabel();
+        themeToggleBtn.addEventListener('click', () => {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            if (isLight) {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+            try {
+                localStorage.setItem('photon-theme', isLight ? 'dark' : 'light');
+            } catch (e) { /* localStorage unavailable, theme still applies for this session */ }
+            syncThemeButtonLabel();
+        });
 
         function initializeGridGlowSystem() {
             const glowTargetBox = document.getElementById('glow-particles-container');
@@ -1156,7 +1568,7 @@
             );
 
             const documentPixelsToVwUnits = bodyBoundingHeight / window.innerWidth * 100;
-            const totalGlowPoints = 40; 
+            const totalGlowPoints = 24; // reduced from 40 to ease scroll-time compositing load
 
             for (let i = 0; i < totalGlowPoints; i++) {
                 const node = document.createElement('div');
@@ -1186,7 +1598,7 @@
             if (!glowTargetBox) return;
             glowTargetBox.innerHTML = '';
 
-            const totalGlowPoints = 16;
+            const totalGlowPoints = 10; // reduced from 16 to ease scroll-time compositing load
 
             for (let i = 0; i < totalGlowPoints; i++) {
                 const node = document.createElement('div');
@@ -1280,9 +1692,21 @@
             requestAnimationFrame(renderCinematicFlyby);
         }
 
+        let capturedDefaultTarget = null;
+        let capturedDefaultFov = null;
+
         carViewer.addEventListener('load', () => {
             carViewer.cameraOrbit = '180deg 45deg 120%';
             carViewer.jumpCameraToGoal();
+
+            // Capture the model's true default pan target / field-of-view exactly once,
+            // right after load, so Explore mode can be reverted to these EXACT values later
+            // instead of recomputing 'auto' fresh each time (which could drift/differ and
+            // made the car look mis-sized after locking the canvas).
+            requestAnimationFrame(() => {
+                capturedDefaultTarget = carViewer.getCameraTarget();
+                capturedDefaultFov = carViewer.getFieldOfView();
+            });
 
             setTimeout(() => {
                 renderCinematicFlyby();
@@ -1323,12 +1747,17 @@
                 const targetVertical = 66 + (Math.sin(orbitTimeline * 1.5) * 7); 
                 const targetZoom = 92 + (Math.cos(orbitTimeline * 1.1) * 16); 
                 
-                // 3. Reset pan offset and field-of-view back to defaults, in addition to the
-                //    orbit angle/zoom. Manual dragging/scrolling in Explore mode can shift the
-                //    pan target and FOV independently of camera-orbit, so resetting orbit alone
+                // 3. Reset pan offset and field-of-view back to their EXACT captured defaults
+                //    (not 'auto', which recomputes fresh and could drift from the original
+                //    framing). Manual dragging/scrolling in Explore mode can shift the pan
+                //    target and FOV independently of camera-orbit, so resetting orbit alone
                 //    left the car looking mis-sized or off-center after locking the canvas.
-                carViewer.cameraTarget = 'auto';
-                carViewer.fieldOfView = 'auto';
+                if (capturedDefaultTarget) {
+                    carViewer.cameraTarget = `${capturedDefaultTarget.x}m ${capturedDefaultTarget.y}m ${capturedDefaultTarget.z}m`;
+                }
+                if (capturedDefaultFov !== null) {
+                    carViewer.fieldOfView = `${capturedDefaultFov}deg`;
+                }
                 carViewer.cameraOrbit = `${targetHorizontal}deg ${targetVertical}deg ${targetZoom}%`;
                 
                 // 4. Wait 1.8 seconds for the glide to physically complete before flooding it with animation frame updates
@@ -1363,6 +1792,149 @@
                 fullscreenWidget.innerHTML = '<span>⛶</span> Fullscreen';
             }
         });
+
+        // ================= EASTER EGG: Constellation mini-game =================
+        (function initConstellationEasterEgg() {
+            const trigger = document.getElementById('constellation-trigger');
+            const overlay = document.getElementById('constellation-overlay');
+            const closeBtn = document.getElementById('constellation-close');
+            const stage = document.getElementById('constellation-stage');
+            const svgLines = document.getElementById('constellation-lines');
+            const secretOverlay = document.getElementById('secret-page-overlay');
+            const secretClose = document.getElementById('secret-close');
+
+            if (!trigger || !overlay || !stage) return;
+
+            // Target points sketch out a capital Gamma (Γ): a horizontal top stroke
+            // plus a vertical stroke down from its left end.
+            const gammaTargets = [
+                { x: 30, y: 22 },
+                { x: 68, y: 22 },
+                { x: 30, y: 78 }
+            ];
+
+            let orbs = [];
+            let dragging = null;
+            let gammaUnlocked = false;
+
+            function randomPos() {
+                return { x: 12 + Math.random() * 76, y: 12 + Math.random() * 76 };
+            }
+
+            function buildOrbs() {
+                stage.querySelectorAll('.constellation-orb').forEach((o) => o.remove());
+                orbs = [];
+                const total = 6; // 3 key orbs needed for the gamma shape, 3 free ones just for fun
+                for (let i = 0; i < total; i++) {
+                    const el = document.createElement('div');
+                    el.className = 'constellation-orb';
+                    const pos = randomPos();
+                    el.style.left = pos.x + '%';
+                    el.style.top = pos.y + '%';
+                    el.dataset.x = pos.x;
+                    el.dataset.y = pos.y;
+                    el.dataset.key = i < 3 ? 'true' : 'false';
+                    el.dataset.targetIndex = i < 3 ? String(i) : '';
+                    el.addEventListener('pointerdown', onOrbPointerDown);
+                    stage.appendChild(el);
+                    orbs.push(el);
+                }
+                updateLines();
+            }
+
+            function onOrbPointerDown(e) {
+                if (gammaUnlocked) return;
+                dragging = e.currentTarget;
+                try { dragging.setPointerCapture(e.pointerId); } catch (err) { /* no-op */ }
+            }
+
+            function onPointerMove(e) {
+                if (!dragging) return;
+                const rect = stage.getBoundingClientRect();
+                let x = ((e.clientX - rect.left) / rect.width) * 100;
+                let y = ((e.clientY - rect.top) / rect.height) * 100;
+                x = Math.max(3, Math.min(97, x));
+                y = Math.max(3, Math.min(97, y));
+                dragging.style.left = x + '%';
+                dragging.style.top = y + '%';
+                dragging.dataset.x = x;
+                dragging.dataset.y = y;
+                updateLines();
+            }
+
+            function onPointerUp() {
+                if (!dragging) return;
+                dragging = null;
+                checkGamma();
+            }
+
+            function dist(a, b) {
+                return Math.hypot(a.x - b.x, a.y - b.y);
+            }
+
+            function updateLines() {
+                // Free-form constellation lines: any two orbs close enough get linked,
+                // independent of whether the gamma puzzle has been solved yet.
+                let svg = '';
+                const threshold = 16;
+                for (let i = 0; i < orbs.length; i++) {
+                    for (let j = i + 1; j < orbs.length; j++) {
+                        const a = { x: parseFloat(orbs[i].dataset.x), y: parseFloat(orbs[i].dataset.y) };
+                        const b = { x: parseFloat(orbs[j].dataset.x), y: parseFloat(orbs[j].dataset.y) };
+                        if (dist(a, b) < threshold) {
+                            svg += `<line x1="${a.x}%" y1="${a.y}%" x2="${b.x}%" y2="${b.y}%" stroke="rgba(255,235,0,0.4)" stroke-width="1.5" />`;
+                        }
+                    }
+                }
+                svgLines.innerHTML = svg;
+            }
+
+            function checkGamma() {
+                const keyOrbs = orbs.filter((o) => o.dataset.key === 'true');
+                const tolerance = 9;
+                const allInPlace = keyOrbs.every((orb) => {
+                    const target = gammaTargets[parseInt(orb.dataset.targetIndex, 10)];
+                    const pos = { x: parseFloat(orb.dataset.x), y: parseFloat(orb.dataset.y) };
+                    return dist(pos, target) < tolerance;
+                });
+
+                if (allInPlace && !gammaUnlocked) {
+                    gammaUnlocked = true;
+                    keyOrbs.forEach((o) => o.classList.add('gamma-success-flash'));
+                    drawGammaLines(keyOrbs);
+                    setTimeout(() => {
+                        overlay.classList.remove('visible-overlay');
+                        secretOverlay.classList.add('visible-overlay');
+                    }, 1300);
+                }
+            }
+
+            function drawGammaLines(keyOrbs) {
+                const a = keyOrbs.find((o) => o.dataset.targetIndex === '0');
+                const b = keyOrbs.find((o) => o.dataset.targetIndex === '1');
+                const c = keyOrbs.find((o) => o.dataset.targetIndex === '2');
+                const pa = { x: parseFloat(a.dataset.x), y: parseFloat(a.dataset.y) };
+                const pb = { x: parseFloat(b.dataset.x), y: parseFloat(b.dataset.y) };
+                const pc = { x: parseFloat(c.dataset.x), y: parseFloat(c.dataset.y) };
+                svgLines.innerHTML += `
+                    <line x1="${pa.x}%" y1="${pa.y}%" x2="${pb.x}%" y2="${pb.y}%" stroke="rgba(255,235,0,0.9)" stroke-width="3" />
+                    <line x1="${pa.x}%" y1="${pa.y}%" x2="${pc.x}%" y2="${pc.y}%" stroke="rgba(255,235,0,0.9)" stroke-width="3" />
+                `;
+            }
+
+            trigger.addEventListener('click', () => {
+                gammaUnlocked = false;
+                buildOrbs();
+                overlay.classList.add('visible-overlay');
+            });
+
+            closeBtn.addEventListener('click', () => overlay.classList.remove('visible-overlay'));
+            secretClose.addEventListener('click', () => secretOverlay.classList.remove('visible-overlay'));
+
+            document.addEventListener('pointermove', onPointerMove);
+            document.addEventListener('pointerup', onPointerUp);
+            document.addEventListener('pointercancel', onPointerUp);
+        })();
     </script>
 </body>
 </html>
