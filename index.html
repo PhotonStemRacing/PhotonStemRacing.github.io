@@ -1145,44 +1145,83 @@
         }
 
         /* ================= EASTER EGG: Lantern orb ================= */
-        .lantern-orb {
-            position: fixed;
-            top: 120px;
-            left: 46px;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: #ffeb00;
-            /* Same glow strength as a normal ambient orb -- not brighter */
-            box-shadow: 0 0 25px 10px rgba(255, 235, 0, 0.6),
-                        0 0 60px 25px rgba(255, 235, 0, 0.3),
-                        0 0 120px 50px rgba(255, 235, 0, 0.15);
-            cursor: pointer;
-            z-index: 150;
-            pointer-events: auto;
-            transition: transform 0.25s ease;
-            animation: lanternIdlePulse 5s ease-in-out infinite alternate;
+        #lantern-home-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
         }
 
-        @keyframes lanternIdlePulse {
-            0% { opacity: 0.65; transform: scale(0.9); }
-            100% { opacity: 1; transform: scale(1.05); }
+        /* Invisible stand-in living at the orb's resting spot at all times, purely so
+           JS can measure "where is home right now" (accounting for scroll/parallax)
+           even while the real orb is off wandering the cursor. */
+        .lantern-rest-anchor {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* The real orb reuses .glow-particle (see markup) so at rest it looks, pulses,
+           and parallax-scrolls exactly like every other ambient orb -- it's only
+           visible near the top of the page because that's simply where it lives in
+           the document, same as the rest of them. */
+        .lantern-orb {
+            cursor: pointer;
+            pointer-events: auto;
         }
 
         .lantern-orb:hover {
             transform: scale(1.2);
         }
 
-        /* While active, the orb is repositioned purely via transform (GPU-composited,
-           no layout/reflow cost) instead of changing left/top on every pointer move --
-           that was the source of the movement jitter. */
+        /* While active, it detaches from the document flow and tracks the cursor via
+           transform (GPU-composited, no layout/reflow cost -- changing left/top on
+           every pointer move was the source of the earlier movement jitter). */
         .lantern-orb.lantern-active {
+            position: fixed;
             top: 0;
             left: 0;
+            z-index: 150;
             cursor: none;
-            transition: none;
             animation: none;
             will-change: transform;
+        }
+
+        /* Walking home: small legs and two eyes appear only for this brief transit,
+           then vanish once it settles back into its resting spot */
+        .lantern-orb.lantern-walking {
+            transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+            background-image:
+                radial-gradient(circle 2.5px at 36% 38%, #000 95%, transparent 100%),
+                radial-gradient(circle 2.5px at 64% 38%, #000 95%, transparent 100%);
+        }
+
+        .lantern-orb.lantern-walking::before,
+        .lantern-orb.lantern-walking::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            width: 3px;
+            height: 9px;
+            background: #6b5900;
+            border-radius: 2px;
+            animation: lanternLegStep 0.3s ease-in-out infinite alternate;
+        }
+
+        .lantern-orb.lantern-walking::before {
+            left: 5px;
+        }
+
+        .lantern-orb.lantern-walking::after {
+            right: 5px;
+            animation-delay: 0.15s;
+        }
+
+        @keyframes lanternLegStep {
+            0% { transform: rotate(-22deg); }
+            100% { transform: rotate(22deg); }
         }
 
         /* Hidden strip at the very bottom of the page: text color matches the
@@ -1257,13 +1296,35 @@
             50% { transform: translateY(6px); opacity: 1; }
         }
 
+        /* A slow, deliberate "tick" (mostly still, briefly pulses once per cycle) once
+           the lantern gets near the secret text -- a quiet hint the map itself gives,
+           without any text saying so */
+        #lantern-map.lantern-map-near {
+            animation: lanternMapTick 2.4s steps(1) infinite;
+        }
+
+        @keyframes lanternMapTick {
+            0%, 90%, 100% { transform: translateY(0) scale(1); }
+            95% { transform: translateY(0) scale(1.22); }
+        }
+
     </style>
 </head>
 <body>
 
+
     <!-- Infrastructure Base Overlay Layouts -->
     <div id="bg-grid-overlay"></div>
     <div id="glow-particles-container"></div>
+
+    <!-- Lives at a fixed spot near the top of the page (like the ambient orbs, sharing
+         their parallax/pulse), so it only appears when scrolled near the top -->
+    <div id="lantern-home-container">
+        <div class="glow-particle lantern-rest-anchor" id="lantern-rest-anchor"
+             style="--x:5%; --y:150px; --size:24px; --pulse-duration:5s; --pulse-delay:0s;" aria-hidden="true"></div>
+        <div class="glow-particle lantern-orb" id="lantern-orb"
+             style="--x:5%; --y:150px; --size:24px; --pulse-duration:5s; --pulse-delay:0s;"></div>
+    </div>
 
     <nav>
         <div class="nav-left-cluster">
@@ -1479,7 +1540,6 @@
     </div>
 
     <!-- ================= EASTER EGG: Lantern orb ================= -->
-    <div class="lantern-orb" id="lantern-orb"></div>
     <div id="lantern-map">
         <span class="lantern-map-arrow">↓</span>
     </div>
@@ -1755,9 +1815,11 @@
         // ================= EASTER EGG: Lantern orb =================
         (function initLanternEasterEgg() {
             const orb = document.getElementById('lantern-orb');
+            const anchor = document.getElementById('lantern-rest-anchor');
             const mapEl = document.getElementById('lantern-map');
+            const secretStrip = document.getElementById('secret-lantern-strip');
             const secretText = document.getElementById('secret-lantern-text');
-            if (!orb || !mapEl) return;
+            if (!orb || !anchor || !mapEl) return;
 
             // Wrap every character in its own span so each letter can be revealed
             // individually -- finding the whole phrase takes some genuine searching,
@@ -1775,13 +1837,16 @@
                 }
             }
 
-            const ORB_RADIUS = 12.5; // half of the orb's own width/height, to center it on the cursor
+            const ORB_RADIUS = 12;
             const LETTER_REVEAL_DISTANCE = 42; // tight radius -- you have to be right over a letter
+            const MAP_TICK_DISTANCE = 550; // wider radius -- the map just "gets warm"
+            const WALK_DURATION = 900;
 
             let lanternActive = false;
             let latestX = 0;
             let latestY = 0;
             let frameQueued = false;
+            let walkTimeoutId = null;
 
             function applyFrame() {
                 frameQueued = false;
@@ -1808,6 +1873,16 @@
                         letter.classList.toggle('lantern-revealed', dist < LETTER_REVEAL_DISTANCE);
                     }
                 }
+
+                // Separate, wider check just for the map's slow "tick" -- a quiet
+                // getting-warmer cue with no text attached to it
+                if (secretStrip) {
+                    const stripRect = secretStrip.getBoundingClientRect();
+                    const scx = stripRect.left + stripRect.width / 2;
+                    const scy = stripRect.top + stripRect.height / 2;
+                    const warmDist = Math.hypot(latestX - scx, latestY - scy);
+                    mapEl.classList.toggle('lantern-map-near', warmDist < MAP_TICK_DISTANCE);
+                }
             }
 
             function onPointerMove(e) {
@@ -1821,7 +1896,13 @@
             }
 
             function activateLantern(x, y) {
+                if (walkTimeoutId) {
+                    clearTimeout(walkTimeoutId);
+                    walkTimeoutId = null;
+                }
                 lanternActive = true;
+                orb.classList.remove('lantern-walking');
+                orb.style.transition = '';
                 orb.classList.add('lantern-active');
                 mapEl.classList.add('lantern-map-visible');
                 latestX = x;
@@ -1831,10 +1912,27 @@
 
             function deactivateLantern() {
                 lanternActive = false;
-                orb.classList.remove('lantern-active');
                 mapEl.classList.remove('lantern-map-visible');
-                orb.style.transform = '';
+                mapEl.classList.remove('lantern-map-near');
                 secretLetters.forEach((letter) => letter.classList.remove('lantern-revealed'));
+
+                // Walk home: measure exactly where the resting spot is on screen right
+                // now (accounting for scroll/parallax) and animate toward it, legs and
+                // eyes included, rather than snapping straight back.
+                const rect = anchor.getBoundingClientRect();
+                const targetX = rect.left + rect.width / 2;
+                const targetY = rect.top + rect.height / 2;
+
+                orb.classList.add('lantern-walking');
+                void orb.offsetWidth; // force reflow so the transition below is guaranteed to animate, not jump
+                orb.style.transform = `translate3d(${targetX - ORB_RADIUS}px, ${targetY - ORB_RADIUS}px, 0)`;
+
+                walkTimeoutId = setTimeout(() => {
+                    orb.classList.remove('lantern-active', 'lantern-walking');
+                    orb.style.transition = '';
+                    orb.style.transform = '';
+                    walkTimeoutId = null;
+                }, WALK_DURATION);
             }
 
             orb.addEventListener('click', (e) => {
