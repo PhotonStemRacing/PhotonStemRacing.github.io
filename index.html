@@ -1195,7 +1195,14 @@
         /* Walking home: small legs and two eyes appear only for this brief transit,
            then vanish once it settles back into its resting spot */
         .lantern-orb.lantern-walking {
-            transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Smooth, continuous, and slow -- steps() made large distances look like
+               big jittery jumps rather than a walk. The fast little leg-swing animation
+               underneath is what actually sells "walking" here, not the body's own path. */
+            transition: transform 2.8s linear;
+            /* A small bob layered on top via margin (not transform, which is already
+               busy driving the actual travel) -- this is what actually reads as steps
+               rather than a straight glide */
+            animation: lanternWalkBob 0.3s ease-in-out infinite;
             background-image:
                 radial-gradient(circle 2.5px at 36% 38%, #000 95%, transparent 100%),
                 radial-gradient(circle 2.5px at 64% 38%, #000 95%, transparent 100%);
@@ -1225,6 +1232,11 @@
         @keyframes lanternLegStep {
             0% { transform: rotate(-22deg); }
             100% { transform: rotate(22deg); }
+        }
+
+        @keyframes lanternWalkBob {
+            0%, 100% { margin-top: 0; }
+            50% { margin-top: -3px; }
         }
 
         /* Hidden strip at the very bottom of the page: text color matches the
@@ -1843,7 +1855,7 @@
             const ORB_RADIUS = 12;
             const LETTER_REVEAL_DISTANCE = 42; // tight radius -- you have to be right over a letter
             const MAP_TICK_DISTANCE = 550; // wider radius -- the map just "gets warm"
-            const WALK_DURATION = 900;
+            const WALK_DURATION = 2800;
 
             let lanternActive = false;
             let latestX = 0;
