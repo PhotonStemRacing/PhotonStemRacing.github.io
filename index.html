@@ -1204,10 +1204,16 @@
             letter-spacing: 6px;
             color: var(--bg-main);
             user-select: none;
-            transition: color 0.4s ease, text-shadow 0.4s ease;
         }
 
-        #secret-lantern-text.lantern-revealed {
+        /* Each character gets wrapped in its own span by JS, and only glows in once the
+           lantern passes directly over that specific letter -- not the whole word at once */
+        .secret-letter {
+            color: var(--bg-main);
+            transition: color 0.25s ease, text-shadow 0.25s ease;
+        }
+
+        .secret-letter.lantern-revealed {
             color: #ffeb00;
             text-shadow: 0 0 18px rgba(255, 235, 0, 0.75), 0 0 40px rgba(255, 235, 0, 0.4);
         }
@@ -1753,8 +1759,24 @@
             const secretText = document.getElementById('secret-lantern-text');
             if (!orb || !mapEl) return;
 
+            // Wrap every character in its own span so each letter can be revealed
+            // individually -- finding the whole phrase takes some genuine searching,
+            // rather than the whole line lighting up as soon as you're in the area.
+            let secretLetters = [];
+            if (secretText) {
+                const text = secretText.textContent;
+                secretText.textContent = '';
+                for (const ch of text) {
+                    const span = document.createElement('span');
+                    span.className = 'secret-letter';
+                    span.textContent = ch;
+                    secretText.appendChild(span);
+                    secretLetters.push(span);
+                }
+            }
+
             const ORB_RADIUS = 12.5; // half of the orb's own width/height, to center it on the cursor
-            const REVEAL_DISTANCE = 220; // px from the secret text before it starts glowing in
+            const LETTER_REVEAL_DISTANCE = 42; // tight radius -- you have to be right over a letter
 
             let lanternActive = false;
             let latestX = 0;
@@ -1769,17 +1791,21 @@
                 // left/top on every raw pointer event -- that was what caused the jitter.
                 orb.style.transform = `translate3d(${latestX - ORB_RADIUS}px, ${latestY - ORB_RADIUS}px, 0)`;
 
-                if (secretText) {
-                    const rect = secretText.getBoundingClientRect();
-                    // Only bother measuring distance if the text is actually near the
-                    // current viewport (cheap guard against needless work while scrolled away)
-                    if (rect.bottom > -400 && rect.top < window.innerHeight + 400) {
-                        const cx = rect.left + rect.width / 2;
-                        const cy = rect.top + rect.height / 2;
+                if (secretLetters.length) {
+                    const containerRect = secretText.getBoundingClientRect();
+                    // Cheap guard: skip all per-letter measuring unless the whole strip
+                    // is anywhere near the current viewport
+                    const nearViewport = containerRect.bottom > -400 && containerRect.top < window.innerHeight + 400;
+                    for (const letter of secretLetters) {
+                        if (!nearViewport) {
+                            letter.classList.remove('lantern-revealed');
+                            continue;
+                        }
+                        const r = letter.getBoundingClientRect();
+                        const cx = r.left + r.width / 2;
+                        const cy = r.top + r.height / 2;
                         const dist = Math.hypot(latestX - cx, latestY - cy);
-                        secretText.classList.toggle('lantern-revealed', dist < REVEAL_DISTANCE);
-                    } else {
-                        secretText.classList.remove('lantern-revealed');
+                        letter.classList.toggle('lantern-revealed', dist < LETTER_REVEAL_DISTANCE);
                     }
                 }
             }
@@ -1808,7 +1834,7 @@
                 orb.classList.remove('lantern-active');
                 mapEl.classList.remove('lantern-map-visible');
                 orb.style.transform = '';
-                if (secretText) secretText.classList.remove('lantern-revealed');
+                secretLetters.forEach((letter) => letter.classList.remove('lantern-revealed'));
             }
 
             orb.addEventListener('click', (e) => {
