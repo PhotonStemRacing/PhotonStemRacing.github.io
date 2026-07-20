@@ -839,6 +839,25 @@
             margin-bottom: 40px;
         }
 
+        .about-block {
+            max-width: 900px;
+            margin: 0 auto 70px auto;
+            text-align: center;
+        }
+
+        .about-block:last-child {
+            margin-bottom: 0;
+        }
+
+        .about-text {
+            color: var(--page-text-muted);
+            font-size: 1.05rem;
+            line-height: 1.9;
+            letter-spacing: 0.2px;
+            margin: 0;
+            text-align: left;
+        }
+
         .btn {
             display: inline-block;
             padding: 14px 32px;
@@ -1121,199 +1140,6 @@
             }
         }
 
-        /* ================= EASTER EGG: Constellation mini-game ================= */
-        #constellation-trigger {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 500;
-            width: 46px;
-            height: 46px;
-            border-radius: 50%;
-            background: rgba(10, 10, 10, 0.85);
-            border: 1px solid rgba(255, 235, 0, 0.4);
-            color: var(--primary-yellow);
-            font-size: 1.3rem;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(255, 235, 0, 0.25);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        #constellation-trigger:hover {
-            transform: scale(1.12);
-            box-shadow: 0 0 26px rgba(255, 235, 0, 0.5);
-        }
-
-        .hidden-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.95);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            padding: 30px;
-            box-sizing: border-box;
-        }
-
-        .hidden-overlay.visible-overlay {
-            display: flex;
-        }
-
-        .overlay-close-btn {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #ffffff;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .overlay-close-btn:hover {
-            border-color: var(--primary-yellow);
-            color: var(--primary-yellow);
-        }
-
-        .constellation-hint {
-            position: absolute;
-            top: 50px;
-            left: 0;
-            right: 0;
-            z-index: 2;
-            color: #cccccc;
-            letter-spacing: 1px;
-            text-align: center;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            line-height: 1.8;
-            pointer-events: none;
-        }
-
-        .constellation-hint span {
-            color: var(--primary-yellow);
-            font-weight: 900;
-            font-size: 1.2rem;
-        }
-
-        #constellation-stage {
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-            touch-action: none;
-        }
-
-        #constellation-lines {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-
-        .gamma-target {
-            position: absolute;
-            width: 26px;
-            height: 26px;
-            border: 1px dashed rgba(255, 235, 0, 0.35);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
-
-        .constellation-orb {
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: var(--primary-yellow);
-            box-shadow: 0 0 15px 6px rgba(255, 235, 0, 0.55), 0 0 35px 14px rgba(255, 235, 0, 0.25);
-            transform: translate(-50%, -50%);
-            cursor: grab;
-            touch-action: none;
-        }
-
-        .constellation-orb:active {
-            cursor: grabbing;
-        }
-
-        .gamma-success-flash {
-            animation: gammaFlash 1.3s ease;
-        }
-
-        @keyframes gammaFlash {
-            0%, 100% { box-shadow: 0 0 15px 6px rgba(255, 235, 0, 0.55), 0 0 35px 14px rgba(255, 235, 0, 0.25); }
-            50% { box-shadow: 0 0 35px 16px rgba(255, 235, 0, 0.95), 0 0 80px 32px rgba(255, 235, 0, 0.55); }
-        }
-
-        /* Secret PHOTON reveal page */
-        .secret-photon-wrap {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .secret-photon-text {
-            font-size: clamp(3rem, 14vw, 11rem);
-            font-weight: 900;
-            letter-spacing: 10px;
-            color: var(--primary-yellow);
-            margin: 0;
-            text-shadow: 0 0 20px rgba(255, 235, 0, 0.8), 0 0 60px rgba(255, 235, 0, 0.6), 0 0 120px rgba(255, 235, 0, 0.4);
-            animation: photonPulse 2.4s ease-in-out infinite, photonShake 6s ease-in-out infinite;
-            position: relative;
-            z-index: 2;
-        }
-
-        @keyframes photonPulse {
-            0%, 100% { transform: scale(1); text-shadow: 0 0 20px rgba(255, 235, 0, 0.8), 0 0 60px rgba(255, 235, 0, 0.6), 0 0 120px rgba(255, 235, 0, 0.4); }
-            50% { transform: scale(1.06); text-shadow: 0 0 45px rgba(255, 235, 0, 1), 0 0 110px rgba(255, 235, 0, 0.85), 0 0 220px rgba(255, 235, 0, 0.6); }
-        }
-
-        @keyframes photonShake {
-            0%, 100% { letter-spacing: 10px; }
-            50% { letter-spacing: 17px; }
-        }
-
-        .secret-photon-glow-ring {
-            position: absolute;
-            width: 140%;
-            height: 300%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: conic-gradient(from 0deg, rgba(255, 235, 0, 0) 0%, rgba(255, 235, 0, 0.3) 12%, rgba(255, 235, 0, 0) 28%);
-            animation: ringSpin 7s linear infinite;
-            z-index: 1;
-            filter: blur(35px);
-            pointer-events: none;
-        }
-
-        .secret-photon-glow-ring-2 {
-            animation-duration: 11s;
-            animation-direction: reverse;
-            opacity: 0.6;
-        }
-
-        @keyframes ringSpin {
-            from { transform: translate(-50%, -50%) rotate(0deg); }
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        .secret-photon-caption {
-            margin-top: 40px;
-            color: rgba(255, 255, 255, 0.6);
-            letter-spacing: 8px;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-        }
     </style>
 </head>
 <body>
@@ -1328,6 +1154,7 @@
             <button class="studio-toggle-btn" id="studio-master-toggle">Explore Car</button>
         </div>
         <ul>
+            <li><a href="#about">About</a></li>
             <li><a href="#team">Team</a></li>
             <li><a href="#sponsors">Partners</a></li>
             <li><a href="#portfolios">Docs</a></li>
@@ -1372,6 +1199,21 @@
     <!-- Bridges the hero's bottom fade smoothly into the Team Roles section, instead of the
          hero cutting off and the section's carbon-fibre texture starting abruptly right after it -->
     <div class="hero-team-fade-bridge" aria-hidden="true"></div>
+
+    <!-- About / Team History Section -->
+    <section id="about">
+        <h3 class="section-title reveal">Our Story</h3>
+
+        <div class="about-block reveal">
+            <h4 class="sub-tier-title">What Is F1 in Schools?</h4>
+            <p class="about-text">F1 in Schools challenges secondary school students to work as a real engineering and enterprise company: designing, analysing, manufacturing and racing a miniature Formula 1 car powered by a CO2 cartridge, then pitching that work to judges exactly as a professional motorsport team would.</p>
+        </div>
+
+        <div class="about-block reveal">
+            <h4 class="sub-tier-title">Team History</h4>
+            <p class="about-text">We began in 2023 as Cadet team Kevlar, placing 2nd overall in the state and 4th in racing. In 2024, having renamed ourselves Aramid after realising "Kevlar" was a trademarked name, we placed 1st in racing and 4th overall, with our only racing loss coming against Team Bluefin. Our car set a state record, the fastest in state history, with a lap time of 1.26 seconds over 20 metres — though a weak enterprise campaign held us to 4th overall for development. Shame got the better of us in 2025, and we didn't compete. This year, 2026, we're back and racing in the Professional Class. Our enterprise team has been fully reworked, featuring Evan Goodwin, a master of persuasive writing, Lizzie Cooke, a master of graphic design, and Zeke Short, a master of all things Formula 1. Our engineering team remains unchanged: Gifford Roy, a master of engineering and CAD, and Bruno Gomez Pena, a master of manufacturing and car painting.</p>
+        </div>
+    </section>
 
     <!-- Team Roles Section -->
     <section id="team">
@@ -1514,30 +1356,6 @@
     <footer>
         <p>&copy; 2026 PHOTON. ALL RIGHTS RESERVED.</p>
     </footer>
-
-    <!-- ================= EASTER EGG: Constellation mini-game ================= -->
-    <button id="constellation-trigger" title="A little secret...">✦</button>
-
-    <div id="constellation-overlay" class="hidden-overlay">
-        <button id="constellation-close" class="overlay-close-btn">✕</button>
-        <p class="constellation-hint">Drag the orbs to make a constellation.<br>Form the shape of <span>γ</span> (gamma) to unlock something.</p>
-        <div id="constellation-stage">
-            <svg id="constellation-lines"></svg>
-            <div class="gamma-target" style="left:70%;top:20%;"></div>
-            <div class="gamma-target" style="left:27%;top:32%;"></div>
-            <div class="gamma-target" style="left:48%;top:82%;"></div>
-        </div>
-    </div>
-
-    <div id="secret-page-overlay" class="hidden-overlay">
-        <button id="secret-close" class="overlay-close-btn">✕</button>
-        <div class="secret-photon-wrap">
-            <div class="secret-photon-glow-ring"></div>
-            <div class="secret-photon-glow-ring secret-photon-glow-ring-2"></div>
-            <h1 class="secret-photon-text">PHOTON</h1>
-        </div>
-        <p class="secret-photon-caption">AT THE SPEED OF LIGHT</p>
-    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
@@ -1808,149 +1626,6 @@
             }
         });
 
-        // ================= EASTER EGG: Constellation mini-game =================
-        (function initConstellationEasterEgg() {
-            const trigger = document.getElementById('constellation-trigger');
-            const overlay = document.getElementById('constellation-overlay');
-            const closeBtn = document.getElementById('constellation-close');
-            const stage = document.getElementById('constellation-stage');
-            const svgLines = document.getElementById('constellation-lines');
-            const secretOverlay = document.getElementById('secret-page-overlay');
-            const secretClose = document.getElementById('secret-close');
-
-            if (!trigger || !overlay || !stage) return;
-
-            // Target points sketch out the lowercase gamma (γ) glyph: a long diagonal
-            // stroke from the top-right down to a bottom vertex, plus a shorter hooked
-            // stroke joining in from the top-left -- both meeting at that bottom point.
-            const gammaTargets = [
-                { x: 70, y: 20 }, // top-right, start of the long diagonal
-                { x: 27, y: 32 }, // top-left hook
-                { x: 48, y: 82 }  // bottom vertex where both strokes meet
-            ];
-
-            let orbs = [];
-            let dragging = null;
-            let gammaUnlocked = false;
-
-            function randomPos() {
-                return { x: 12 + Math.random() * 76, y: 12 + Math.random() * 76 };
-            }
-
-            function buildOrbs() {
-                stage.querySelectorAll('.constellation-orb').forEach((o) => o.remove());
-                orbs = [];
-                const total = 6; // 3 key orbs needed for the gamma shape, 3 free ones just for fun
-                for (let i = 0; i < total; i++) {
-                    const el = document.createElement('div');
-                    el.className = 'constellation-orb';
-                    const pos = randomPos();
-                    el.style.left = pos.x + '%';
-                    el.style.top = pos.y + '%';
-                    el.dataset.x = pos.x;
-                    el.dataset.y = pos.y;
-                    el.dataset.key = i < 3 ? 'true' : 'false';
-                    el.dataset.targetIndex = i < 3 ? String(i) : '';
-                    el.addEventListener('pointerdown', onOrbPointerDown);
-                    stage.appendChild(el);
-                    orbs.push(el);
-                }
-                updateLines();
-            }
-
-            function onOrbPointerDown(e) {
-                if (gammaUnlocked) return;
-                dragging = e.currentTarget;
-                try { dragging.setPointerCapture(e.pointerId); } catch (err) { /* no-op */ }
-            }
-
-            function onPointerMove(e) {
-                if (!dragging) return;
-                const rect = stage.getBoundingClientRect();
-                let x = ((e.clientX - rect.left) / rect.width) * 100;
-                let y = ((e.clientY - rect.top) / rect.height) * 100;
-                x = Math.max(3, Math.min(97, x));
-                y = Math.max(3, Math.min(97, y));
-                dragging.style.left = x + '%';
-                dragging.style.top = y + '%';
-                dragging.dataset.x = x;
-                dragging.dataset.y = y;
-                updateLines();
-            }
-
-            function onPointerUp() {
-                if (!dragging) return;
-                dragging = null;
-                checkGamma();
-            }
-
-            function dist(a, b) {
-                return Math.hypot(a.x - b.x, a.y - b.y);
-            }
-
-            function updateLines() {
-                // Free-form constellation lines: any two orbs close enough get linked,
-                // independent of whether the gamma puzzle has been solved yet.
-                let svg = '';
-                const threshold = 16;
-                for (let i = 0; i < orbs.length; i++) {
-                    for (let j = i + 1; j < orbs.length; j++) {
-                        const a = { x: parseFloat(orbs[i].dataset.x), y: parseFloat(orbs[i].dataset.y) };
-                        const b = { x: parseFloat(orbs[j].dataset.x), y: parseFloat(orbs[j].dataset.y) };
-                        if (dist(a, b) < threshold) {
-                            svg += `<line x1="${a.x}%" y1="${a.y}%" x2="${b.x}%" y2="${b.y}%" stroke="rgba(255,235,0,0.4)" stroke-width="1.5" />`;
-                        }
-                    }
-                }
-                svgLines.innerHTML = svg;
-            }
-
-            function checkGamma() {
-                const keyOrbs = orbs.filter((o) => o.dataset.key === 'true');
-                const tolerance = 9;
-                const allInPlace = keyOrbs.every((orb) => {
-                    const target = gammaTargets[parseInt(orb.dataset.targetIndex, 10)];
-                    const pos = { x: parseFloat(orb.dataset.x), y: parseFloat(orb.dataset.y) };
-                    return dist(pos, target) < tolerance;
-                });
-
-                if (allInPlace && !gammaUnlocked) {
-                    gammaUnlocked = true;
-                    keyOrbs.forEach((o) => o.classList.add('gamma-success-flash'));
-                    drawGammaLines(keyOrbs);
-                    setTimeout(() => {
-                        overlay.classList.remove('visible-overlay');
-                        secretOverlay.classList.add('visible-overlay');
-                    }, 1300);
-                }
-            }
-
-            function drawGammaLines(keyOrbs) {
-                const topRight = keyOrbs.find((o) => o.dataset.targetIndex === '0');
-                const topLeftHook = keyOrbs.find((o) => o.dataset.targetIndex === '1');
-                const bottomVertex = keyOrbs.find((o) => o.dataset.targetIndex === '2');
-                const pTopRight = { x: parseFloat(topRight.dataset.x), y: parseFloat(topRight.dataset.y) };
-                const pHook = { x: parseFloat(topLeftHook.dataset.x), y: parseFloat(topLeftHook.dataset.y) };
-                const pBottom = { x: parseFloat(bottomVertex.dataset.x), y: parseFloat(bottomVertex.dataset.y) };
-                svgLines.innerHTML += `
-                    <line x1="${pTopRight.x}%" y1="${pTopRight.y}%" x2="${pBottom.x}%" y2="${pBottom.y}%" stroke="rgba(255,235,0,0.9)" stroke-width="3" />
-                    <line x1="${pHook.x}%" y1="${pHook.y}%" x2="${pBottom.x}%" y2="${pBottom.y}%" stroke="rgba(255,235,0,0.9)" stroke-width="3" />
-                `;
-            }
-
-            trigger.addEventListener('click', () => {
-                gammaUnlocked = false;
-                buildOrbs();
-                overlay.classList.add('visible-overlay');
-            });
-
-            closeBtn.addEventListener('click', () => overlay.classList.remove('visible-overlay'));
-            secretClose.addEventListener('click', () => secretOverlay.classList.remove('visible-overlay'));
-
-            document.addEventListener('pointermove', onPointerMove);
-            document.addEventListener('pointerup', onPointerUp);
-            document.addEventListener('pointercancel', onPointerUp);
-        })();
     </script>
 </body>
 </html>
