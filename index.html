@@ -5,15 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Photon | STEM Team</title>
 
-    <!-- Applied before first paint so there's no flash of the wrong theme -->
-    <script>
-        try {
-            if (localStorage.getItem('photon-theme') === 'light') {
-                document.documentElement.setAttribute('data-theme', 'light');
-            }
-        } catch (e) { /* localStorage unavailable, default (dark) stands */ }
-    </script>
-    
     <!-- Link to the custom tab icon -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
@@ -41,29 +32,42 @@
             --glass-border: rgba(255, 235, 0, 0.1);
             --footer-bg: #000000;
             --grid-line-color: rgba(255, 235, 0, 0.07);
+            /* Text/background pairing for buttons filled with the accent color, and
+               their inverted hover state -- kept as tokens so light mode (where the
+               accent flips from bright yellow to dark graphite) still gets correct
+               contrast instead of black-on-dark or dark-on-dark. */
+            --btn-text: #000000;
+            --btn-bg-hover: #000000;
+            --btn-text-hover: var(--primary-yellow);
             
             /* High-performance scroll coordinate tracking primitive */
             --scroll-y: 0px;
         }
 
         [data-theme="light"] {
-            --bg-main: #f4f3ef;
-            --bg-grid: #eceae4;
-            --nav-bg: rgba(244, 243, 239, 0.92);
-            --page-text: #141414;
-            --page-text-muted: #55534e;
-            --glass-tint-1: rgba(0, 0, 0, 0.05);
-            --glass-tint-2: rgba(255, 255, 255, 0.35);
-            --glass-border: rgba(0, 0, 0, 0.1);
-            --footer-bg: #eceae4;
-            --card-bg: rgba(255, 255, 255, 0.55);
-            --text-light: #141414;
-            --text-muted: #55534e;
-            /* Pure neon yellow reads poorly against a light background, so light mode
-               uses a much darker, more saturated amber for the accent everywhere
-               var(--primary-yellow) is used, keeping real contrast against white/cream. */
-            --primary-yellow: #9c6d00;
-            --grid-line-color: rgba(120, 90, 0, 0.16);
+            /* A mid-tone gray (not white/cream) so yellow accents don't wash out or
+               feel like they're clashing with a bright white page */
+            --bg-main: #d6d5d0;
+            --bg-grid: #cac9c3;
+            --nav-bg: rgba(214, 213, 208, 0.92);
+            --page-text: #171715;
+            --page-text-muted: #4a4945;
+            --glass-tint-1: rgba(0, 0, 0, 0.06);
+            --glass-tint-2: rgba(255, 255, 255, 0.3);
+            --glass-border: rgba(0, 0, 0, 0.14);
+            --footer-bg: #c7c6c0;
+            --card-bg: rgba(255, 255, 255, 0.4);
+            --text-light: #171715;
+            --text-muted: #4a4945;
+            /* Yellow-on-light reads poorly no matter how dark you push it, so light mode
+               drops yellow as the accent entirely and uses dark graphite instead --
+               yellow is still used sparingly as a highlight/glow color, just not for
+               primary text, borders or buttons. */
+            --primary-yellow: #232220;
+            --grid-line-color: rgba(35, 34, 32, 0.14);
+            --btn-text: #f2f1ee;
+            --btn-bg-hover: #f2f1ee;
+            --btn-text-hover: var(--primary-yellow);
         }
 
         html {
@@ -124,7 +128,7 @@
             top: var(--y);
             width: var(--size, 25px);
             height: var(--size, 25px);
-            background-color: var(--primary-yellow);
+            background-color: #ffeb00;
             border-radius: 50%;
             /* Multi-layered extreme glow envelope for high-intensity luminescence */
             box-shadow: 0 0 25px 10px rgba(255, 235, 0, 0.6),
@@ -320,7 +324,7 @@
 
         .studio-toggle-btn.active-studio {
             background: var(--primary-yellow);
-            color: #000000;
+            color: var(--btn-text);
             border-color: var(--primary-yellow);
             box-shadow: 0 0 20px rgba(255, 235, 0, 0.4);
         }
@@ -503,7 +507,7 @@
 
         .fullscreen-toggle:hover {
             background: var(--primary-yellow);
-            color: #000000;
+            color: var(--btn-text);
             border-color: var(--primary-yellow);
             box-shadow: 0 0 20px rgba(255, 235, 0, 0.5);
         }
@@ -862,7 +866,7 @@
             display: inline-block;
             padding: 14px 32px;
             background-color: var(--primary-yellow);
-            color: var(--text-dark);
+            color: var(--btn-text);
             border: 2px solid var(--primary-yellow);
             text-decoration: none;
             text-transform: uppercase;
@@ -875,8 +879,8 @@
         }
 
         .btn:hover {
-            background-color: #000000;
-            color: var(--primary-yellow);
+            background-color: var(--btn-bg-hover);
+            color: var(--btn-text-hover);
             border-color: var(--primary-yellow);
             transform: scale(1.02);
             box-shadow: 0 0 20px rgba(255, 235, 0, 0.4);
@@ -1140,6 +1144,121 @@
             }
         }
 
+        /* ================= EASTER EGG: Lantern orb ================= */
+        .lantern-orb {
+            position: fixed;
+            top: 120px;
+            left: 46px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #ffeb00;
+            box-shadow: 0 0 22px 9px rgba(255, 235, 0, 0.55), 0 0 55px 22px rgba(255, 235, 0, 0.28);
+            cursor: pointer;
+            z-index: 150;
+            pointer-events: auto;
+            transition: transform 0.25s ease;
+            animation: lanternIdlePulse 5s ease-in-out infinite alternate;
+        }
+
+        @keyframes lanternIdlePulse {
+            0% { opacity: 0.65; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .lantern-orb:hover {
+            transform: scale(1.2);
+        }
+
+        .lantern-orb.lantern-active {
+            cursor: none;
+            transition: none;
+            animation: none;
+        }
+
+        /* The flashlight itself: a soft radial glow that follows the cursor once the
+           lantern orb is activated. mix-blend-mode: screen means wherever this glow
+           passes over something dark, that area brightens -- which is what lets it
+           reveal near-black text hidden against a near-black background. */
+        #lantern-light {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 340px;
+            height: 340px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 250, 220, 0.95) 0%, rgba(255, 235, 0, 0.4) 32%, transparent 68%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            mix-blend-mode: screen;
+            z-index: 140;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+
+        #lantern-light.lantern-light-active {
+            opacity: 1;
+        }
+
+        /* Hidden strip at the very bottom of the page: text color matches the
+           background exactly, so it's invisible until the lantern's glow passes over it */
+        #secret-lantern-strip {
+            background-color: var(--bg-main);
+            padding: 60px 20px;
+            text-align: center;
+            margin: 0;
+            transition: background-color 0.5s ease;
+        }
+
+        #secret-lantern-text {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 900;
+            letter-spacing: 6px;
+            color: var(--bg-main);
+            user-select: none;
+            transition: color 0.5s ease;
+        }
+
+        /* Small dismissible indicator that appears once the lantern is switched on,
+           pointing toward the bottom of the page */
+        #lantern-map {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            background: var(--nav-bg);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 160;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        #lantern-map.lantern-map-visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .lantern-map-arrow {
+            color: #ffeb00;
+            font-size: 1.4rem;
+            animation: lanternArrowBounce 1.4s ease-in-out infinite;
+        }
+
+        @keyframes lanternArrowBounce {
+            0%, 100% { transform: translateY(0); opacity: 0.55; }
+            50% { transform: translateY(6px); opacity: 1; }
+        }
+
     </style>
 </head>
 <body>
@@ -1357,6 +1476,17 @@
         <p>&copy; 2026 PHOTON. ALL RIGHTS RESERVED.</p>
     </footer>
 
+    <div id="secret-lantern-strip" aria-hidden="true">
+        <p id="secret-lantern-text">✦PHOTON WILL ALWAYS WIN✦</p>
+    </div>
+
+    <!-- ================= EASTER EGG: Lantern orb ================= -->
+    <div class="lantern-orb" id="lantern-orb"></div>
+    <div id="lantern-light" aria-hidden="true"></div>
+    <div id="lantern-map">
+        <span class="lantern-map-arrow">↓</span>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
@@ -1382,9 +1512,8 @@
             } else {
                 document.documentElement.setAttribute('data-theme', 'light');
             }
-            try {
-                localStorage.setItem('photon-theme', isLight ? 'dark' : 'light');
-            } catch (e) { /* localStorage unavailable, theme still applies for this session */ }
+            // Deliberately not persisted -- dark mode is always the default on a fresh load,
+            // this toggle only affects the current visit.
             syncThemeButtonLabel();
         });
 
@@ -1626,6 +1755,49 @@
             }
         });
 
+        // ================= EASTER EGG: Lantern orb =================
+        (function initLanternEasterEgg() {
+            const orb = document.getElementById('lantern-orb');
+            const light = document.getElementById('lantern-light');
+            const mapEl = document.getElementById('lantern-map');
+            if (!orb || !light || !mapEl) return;
+
+            let lanternActive = false;
+
+            function positionAt(x, y) {
+                orb.style.left = x + 'px';
+                orb.style.top = y + 'px';
+                light.style.left = x + 'px';
+                light.style.top = y + 'px';
+            }
+
+            function onPointerMove(e) {
+                if (!lanternActive) return;
+                positionAt(e.clientX, e.clientY);
+            }
+
+            orb.addEventListener('click', (e) => {
+                lanternActive = !lanternActive;
+                if (lanternActive) {
+                    orb.classList.add('lantern-active');
+                    light.classList.add('lantern-light-active');
+                    mapEl.classList.add('lantern-map-visible');
+                    positionAt(e.clientX, e.clientY);
+                } else {
+                    orb.classList.remove('lantern-active');
+                    light.classList.remove('lantern-light-active');
+                    mapEl.classList.remove('lantern-map-visible');
+                    orb.style.left = '';
+                    orb.style.top = '';
+                }
+            });
+
+            mapEl.addEventListener('click', () => {
+                mapEl.classList.remove('lantern-map-visible');
+            });
+
+            document.addEventListener('pointermove', onPointerMove);
+        })();
     </script>
 </body>
 </html>
