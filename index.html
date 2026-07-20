@@ -1149,11 +1149,14 @@
             position: fixed;
             top: 120px;
             left: 46px;
-            width: 24px;
-            height: 24px;
+            width: 25px;
+            height: 25px;
             border-radius: 50%;
             background: #ffeb00;
-            box-shadow: 0 0 22px 9px rgba(255, 235, 0, 0.55), 0 0 55px 22px rgba(255, 235, 0, 0.28);
+            /* Same glow strength as a normal ambient orb -- not brighter */
+            box-shadow: 0 0 25px 10px rgba(255, 235, 0, 0.6),
+                        0 0 60px 25px rgba(255, 235, 0, 0.3),
+                        0 0 120px 50px rgba(255, 235, 0, 0.15);
             cursor: pointer;
             z-index: 150;
             pointer-events: auto;
@@ -1170,38 +1173,22 @@
             transform: scale(1.2);
         }
 
+        /* While active, the orb is repositioned purely via transform (GPU-composited,
+           no layout/reflow cost) instead of changing left/top on every pointer move --
+           that was the source of the movement jitter. */
         .lantern-orb.lantern-active {
+            top: 0;
+            left: 0;
             cursor: none;
             transition: none;
             animation: none;
-        }
-
-        /* The flashlight itself: a soft radial glow that follows the cursor once the
-           lantern orb is activated. mix-blend-mode: screen means wherever this glow
-           passes over something dark, that area brightens -- which is what lets it
-           reveal near-black text hidden against a near-black background. */
-        #lantern-light {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 340px;
-            height: 340px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 250, 220, 0.95) 0%, rgba(255, 235, 0, 0.4) 32%, transparent 68%);
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            mix-blend-mode: screen;
-            z-index: 140;
-            opacity: 0;
-            transition: opacity 0.35s ease;
-        }
-
-        #lantern-light.lantern-light-active {
-            opacity: 1;
+            will-change: transform;
         }
 
         /* Hidden strip at the very bottom of the page: text color matches the
-           background exactly, so it's invisible until the lantern's glow passes over it */
+           background exactly, so it's invisible normally. Revealing it is handled in
+           JS by proximity to the lantern (not a blend-mode trick, which can't actually
+           distinguish text from a background of the identical color). */
         #secret-lantern-strip {
             background-color: var(--bg-main);
             padding: 60px 20px;
@@ -1217,7 +1204,12 @@
             letter-spacing: 6px;
             color: var(--bg-main);
             user-select: none;
-            transition: color 0.5s ease;
+            transition: color 0.4s ease, text-shadow 0.4s ease;
+        }
+
+        #secret-lantern-text.lantern-revealed {
+            color: #ffeb00;
+            text-shadow: 0 0 18px rgba(255, 235, 0, 0.75), 0 0 40px rgba(255, 235, 0, 0.4);
         }
 
         /* Small dismissible indicator that appears once the lantern is switched on,
@@ -1482,7 +1474,6 @@
 
     <!-- ================= EASTER EGG: Lantern orb ================= -->
     <div class="lantern-orb" id="lantern-orb"></div>
-    <div id="lantern-light" aria-hidden="true"></div>
     <div id="lantern-map">
         <span class="lantern-map-arrow">↓</span>
     </div>
@@ -1758,41 +1749,87 @@
         // ================= EASTER EGG: Lantern orb =================
         (function initLanternEasterEgg() {
             const orb = document.getElementById('lantern-orb');
-            const light = document.getElementById('lantern-light');
             const mapEl = document.getElementById('lantern-map');
-            if (!orb || !light || !mapEl) return;
+            const secretText = document.getElementById('secret-lantern-text');
+            if (!orb || !mapEl) return;
+
+            const ORB_RADIUS = 12.5; // half of the orb's own width/height, to center it on the cursor
+            const REVEAL_DISTANCE = 220; // px from the secret text before it starts glowing in
 
             let lanternActive = false;
+            let latestX = 0;
+            let latestY = 0;
+            let frameQueued = false;
 
-            function positionAt(x, y) {
-                orb.style.left = x + 'px';
-                orb.style.top = y + 'px';
-                light.style.left = x + 'px';
-                light.style.top = y + 'px';
+            function applyFrame() {
+                frameQueued = false;
+                if (!lanternActive) return;
+
+                // Transform is compositor-only (no layout/reflow), unlike updating
+                // left/top on every raw pointer event -- that was what caused the jitter.
+                orb.style.transform = `translate3d(${latestX - ORB_RADIUS}px, ${latestY - ORB_RADIUS}px, 0)`;
+
+                if (secretText) {
+                    const rect = secretText.getBoundingClientRect();
+                    // Only bother measuring distance if the text is actually near the
+                    // current viewport (cheap guard against needless work while scrolled away)
+                    if (rect.bottom > -400 && rect.top < window.innerHeight + 400) {
+                        const cx = rect.left + rect.width / 2;
+                        const cy = rect.top + rect.height / 2;
+                        const dist = Math.hypot(latestX - cx, latestY - cy);
+                        secretText.classList.toggle('lantern-revealed', dist < REVEAL_DISTANCE);
+                    } else {
+                        secretText.classList.remove('lantern-revealed');
+                    }
+                }
             }
 
             function onPointerMove(e) {
                 if (!lanternActive) return;
-                positionAt(e.clientX, e.clientY);
+                latestX = e.clientX;
+                latestY = e.clientY;
+                if (!frameQueued) {
+                    frameQueued = true;
+                    requestAnimationFrame(applyFrame);
+                }
+            }
+
+            function activateLantern(x, y) {
+                lanternActive = true;
+                orb.classList.add('lantern-active');
+                mapEl.classList.add('lantern-map-visible');
+                latestX = x;
+                latestY = y;
+                applyFrame();
+            }
+
+            function deactivateLantern() {
+                lanternActive = false;
+                orb.classList.remove('lantern-active');
+                mapEl.classList.remove('lantern-map-visible');
+                orb.style.transform = '';
+                if (secretText) secretText.classList.remove('lantern-revealed');
             }
 
             orb.addEventListener('click', (e) => {
-                lanternActive = !lanternActive;
+                e.stopPropagation();
                 if (lanternActive) {
-                    orb.classList.add('lantern-active');
-                    light.classList.add('lantern-light-active');
-                    mapEl.classList.add('lantern-map-visible');
-                    positionAt(e.clientX, e.clientY);
+                    deactivateLantern();
                 } else {
-                    orb.classList.remove('lantern-active');
-                    light.classList.remove('lantern-light-active');
-                    mapEl.classList.remove('lantern-map-visible');
-                    orb.style.left = '';
-                    orb.style.top = '';
+                    activateLantern(e.clientX, e.clientY);
                 }
             });
 
-            mapEl.addEventListener('click', () => {
+            // Clicking anywhere else while the lantern is active also releases it --
+            // more forgiving than requiring a precise click back on the (moving) orb.
+            document.addEventListener('click', (e) => {
+                if (lanternActive && e.target !== orb) {
+                    deactivateLantern();
+                }
+            });
+
+            mapEl.addEventListener('click', (e) => {
+                e.stopPropagation();
                 mapEl.classList.remove('lantern-map-visible');
             });
 
