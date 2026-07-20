@@ -1151,7 +1151,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 2;
+            /* Needs to sit above #hero (z-index: 10) and its children, or the hero's
+               own transparent-but-still-click-capturing box intercepts clicks meant
+               for the orb before they ever reach it. */
+            z-index: 16;
             pointer-events: none;
         }
 
