@@ -168,7 +168,10 @@
             -webkit-backdrop-filter: blur(12px) saturate(140%);
         }
 
-        /* Every box gets its own fracture pattern rather than one repeated look */
+        /* Every box gets its own fracture pattern rather than one repeated look. These
+           are a POOL of 5 variants (.fracture-1 through .fracture-5) -- JS randomly
+           assigns one to each individual card, so even cards of the same type (e.g.
+           two sponsor cards) don't necessarily look identical to each other. */
         .team-card::before,
         .sponsor-card::before,
         .portfolio-card::before,
@@ -181,8 +184,8 @@
             z-index: 1;
         }
 
-        /* Team cards: tight, steep diagonal shards */
-        .team-card::before {
+        /* Variant 1: tight, steep diagonal shards */
+        .fracture-1::before {
             background-image:
                 linear-gradient(125deg, transparent 15%, rgba(255, 255, 255, 0.06) 16%, transparent 19%),
                 linear-gradient(80deg, transparent 40%, rgba(255, 255, 255, 0.05) 41%, transparent 45%),
@@ -190,16 +193,16 @@
                 linear-gradient(35deg, transparent 82%, rgba(255, 235, 0, 0.045) 83%, transparent 87%);
         }
 
-        /* Sponsor cards: flatter, more horizontal cracks suited to a wide box */
-        .sponsor-card::before {
+        /* Variant 2: flatter, more horizontal cracks */
+        .fracture-2::before {
             background-image:
                 linear-gradient(100deg, transparent 18%, rgba(255, 255, 255, 0.06) 19%, transparent 23%),
                 linear-gradient(12deg, transparent 48%, rgba(255, 255, 255, 0.045) 49%, transparent 54%),
                 linear-gradient(165deg, transparent 74%, rgba(255, 235, 0, 0.04) 75%, transparent 80%);
         }
 
-        /* Portfolio cards: bigger, bolder shards */
-        .portfolio-card::before {
+        /* Variant 3: bigger, bolder shards */
+        .fracture-3::before {
             background-image:
                 linear-gradient(140deg, transparent 10%, rgba(255, 255, 255, 0.07) 11%, transparent 15%),
                 linear-gradient(50deg, transparent 45%, rgba(255, 255, 255, 0.05) 46%, transparent 51%),
@@ -207,8 +210,8 @@
                 linear-gradient(95deg, transparent 88%, rgba(255, 255, 255, 0.045) 89%, transparent 93%);
         }
 
-        /* Contact box: a single impact point with radiating cracks, since it's the one CTA on the page */
-        .contact-box::before {
+        /* Variant 4: a single impact point with radiating cracks */
+        .fracture-4::before {
             background-image:
                 conic-gradient(from 20deg at 50% 40%,
                     transparent 0deg, rgba(255, 255, 255, 0.05) 2deg, transparent 4deg,
@@ -220,8 +223,8 @@
                     transparent 360deg);
         }
 
-        /* Affiliated entity logos: subtle, light shards so the logos stay clearly legible */
-        .logo-wrapper::before {
+        /* Variant 5: subtle, light shards */
+        .fracture-5::before {
             background-image:
                 linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.05) 31%, transparent 35%),
                 linear-gradient(60deg, transparent 68%, rgba(255, 235, 0, 0.04) 69%, transparent 74%);
@@ -1195,10 +1198,12 @@
         /* Walking home: small legs and two eyes appear only for this brief transit,
            then vanish once it settles back into its resting spot */
         .lantern-orb.lantern-walking {
-            /* Smooth, continuous, and slow -- steps() made large distances look like
-               big jittery jumps rather than a walk. The fast little leg-swing animation
-               underneath is what actually sells "walking" here, not the body's own path. */
-            transition: transform 2.8s linear;
+            /* No duration set here -- JS computes it per-trip from distance / a fixed
+               speed, so a long walk home takes proportionally longer instead of a short
+               and a long trip both taking the same fixed time (which made speed
+               inconsistent depending on how far it had to go). */
+            transition-property: transform;
+            transition-timing-function: linear;
             /* A small bob layered on top via margin (not transform, which is already
                busy driving the actual travel) -- this is what actually reads as steps
                rather than a straight glide */
@@ -1272,26 +1277,25 @@
             text-shadow: 0 0 18px rgba(255, 235, 0, 0.75), 0 0 40px rgba(255, 235, 0, 0.4);
         }
 
-        /* Small dismissible indicator that appears once the lantern is switched on,
-           pointing toward the bottom of the page */
+        /* Small dismissible mini-map that appears once the lantern is switched on:
+           a yellow dot tracks the cursor's position on the page, a red X marks where
+           the secret text actually is, both relative to the whole page layout */
         #lantern-map {
             position: fixed;
             bottom: 24px;
             right: 24px;
-            width: 56px;
-            height: 56px;
-            border-radius: 10px;
+            width: 60px;
+            height: 84px;
+            border-radius: 8px;
             background: var(--nav-bg);
             border: 1px solid var(--glass-border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
             cursor: pointer;
             z-index: 160;
             opacity: 0;
             pointer-events: none;
             transform: translateY(10px);
             transition: opacity 0.4s ease, transform 0.4s ease;
+            overflow: hidden;
         }
 
         #lantern-map.lantern-map-visible {
@@ -1300,27 +1304,59 @@
             transform: translateY(0);
         }
 
-        .lantern-map-arrow {
+        #lantern-map-orb {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ffeb00;
+            box-shadow: 0 0 6px 2px rgba(255, 235, 0, 0.8);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        #lantern-map-x {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            font-size: 0.7rem;
+            font-weight: 900;
+            line-height: 1;
+            color: #ff5252;
+            text-shadow: 0 0 6px rgba(255, 82, 82, 0.7);
+            pointer-events: none;
+        }
+
+        /* Fast-forward button, sits just above the map */
+        #lantern-fastforward {
+            position: fixed;
+            bottom: 116px;
+            right: 24px;
+            width: 60px;
+            height: 34px;
+            border-radius: 8px;
+            background: var(--nav-bg);
+            border: 1px solid var(--glass-border);
             color: #ffeb00;
-            font-size: 1.4rem;
-            animation: lanternArrowBounce 1.4s ease-in-out infinite;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 160;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease, transform 0.4s ease, background 0.3s ease;
         }
 
-        @keyframes lanternArrowBounce {
-            0%, 100% { transform: translateY(0); opacity: 0.55; }
-            50% { transform: translateY(6px); opacity: 1; }
+        #lantern-fastforward.lantern-map-visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
         }
 
-        /* A slow, deliberate "tick" (mostly still, briefly pulses once per cycle) once
-           the lantern gets near the secret text -- a quiet hint the map itself gives,
-           without any text saying so */
-        #lantern-map.lantern-map-near {
-            animation: lanternMapTick 2.4s steps(1) infinite;
-        }
-
-        @keyframes lanternMapTick {
-            0%, 90%, 100% { transform: translateY(0) scale(1); }
-            95% { transform: translateY(0) scale(1.22); }
+        #lantern-fastforward:hover {
+            background: rgba(255, 235, 0, 0.12);
         }
 
     </style>
@@ -1555,8 +1591,10 @@
     </div>
 
     <!-- ================= EASTER EGG: Lantern orb ================= -->
+    <button id="lantern-fastforward" title="">»</button>
     <div id="lantern-map">
-        <span class="lantern-map-arrow">↓</span>
+        <div id="lantern-map-orb"></div>
+        <div id="lantern-map-x">✕</div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1569,6 +1607,13 @@
             history.replaceState("", document.title, window.location.pathname + window.location.search);
         }
         window.scrollTo(0, 0);
+
+        // Randomly assign one of 5 fracture-glass variants to every card-style box,
+        // so individual cards of the same type don't all share the exact same pattern.
+        document.querySelectorAll('.team-card, .sponsor-card, .portfolio-card, .contact-box, .logo-wrapper').forEach((el) => {
+            const variant = 1 + Math.floor(Math.random() * 5);
+            el.classList.add('fracture-' + variant);
+        });
 
         // Light/Dark theme toggle (dark is the default)
         const themeToggleBtn = document.getElementById('theme-toggle');
@@ -1832,13 +1877,16 @@
             const orb = document.getElementById('lantern-orb');
             const anchor = document.getElementById('lantern-rest-anchor');
             const mapEl = document.getElementById('lantern-map');
+            const mapOrb = document.getElementById('lantern-map-orb');
+            const mapX = document.getElementById('lantern-map-x');
+            const ffBtn = document.getElementById('lantern-fastforward');
             const secretStrip = document.getElementById('secret-lantern-strip');
             const secretText = document.getElementById('secret-lantern-text');
             if (!orb || !anchor || !mapEl) return;
 
             // Wrap every character in its own span so each letter can be revealed
             // individually -- finding the whole phrase takes some genuine searching,
-            // rather than the whole line lighting up as soon as you're in the area.
+            // rather than the whole line lighting up as soon as you are in the area.
             let secretLetters = [];
             if (secretText) {
                 const text = secretText.textContent;
@@ -1854,14 +1902,38 @@
 
             const ORB_RADIUS = 12;
             const LETTER_REVEAL_DISTANCE = 42; // tight radius -- you have to be right over a letter
-            const MAP_TICK_DISTANCE = 550; // wider radius -- the map just "gets warm"
-            const WALK_DURATION = 2800;
+            const WALK_SPEED = 22; // px per second -- deliberately slow, a real walking pace
+            const FAST_FORWARD_SPEED = 260; // px per second -- still animated, just much quicker
+            const MIN_WALK_DURATION = 600; // ms, so a very short trip does not look like an instant snap
+            const MAX_WALK_DURATION = 45000; // ms, generous cap for very long trips down a long page
 
             let lanternActive = false;
             let latestX = 0;
             let latestY = 0;
             let frameQueued = false;
             let walkTimeoutId = null;
+
+            // The X markers vertical position (as a fraction of the whole page) never
+            // changes once computed, so it is measured once rather than every frame.
+            function placeMapX() {
+                if (!mapX || !secretStrip) return;
+                const docHeight = document.documentElement.scrollHeight;
+                const stripDocTop = secretStrip.getBoundingClientRect().top + window.scrollY;
+                const stripCenterDocY = stripDocTop + secretStrip.offsetHeight / 2;
+                const yFraction = Math.min(1, Math.max(0, stripCenterDocY / docHeight));
+                mapX.style.left = '50%';
+                mapX.style.top = (yFraction * 100) + '%';
+            }
+
+            function updateMapOrb() {
+                if (!mapOrb) return;
+                const xFraction = Math.min(1, Math.max(0, latestX / window.innerWidth));
+                const docHeight = document.documentElement.scrollHeight;
+                const cursorDocY = window.scrollY + latestY;
+                const yFraction = Math.min(1, Math.max(0, cursorDocY / docHeight));
+                mapOrb.style.left = (xFraction * 100) + '%';
+                mapOrb.style.top = (yFraction * 100) + '%';
+            }
 
             function applyFrame() {
                 frameQueued = false;
@@ -1870,6 +1942,8 @@
                 // Transform is compositor-only (no layout/reflow), unlike updating
                 // left/top on every raw pointer event -- that was what caused the jitter.
                 orb.style.transform = `translate3d(${latestX - ORB_RADIUS}px, ${latestY - ORB_RADIUS}px, 0)`;
+
+                updateMapOrb();
 
                 if (secretLetters.length) {
                     const containerRect = secretText.getBoundingClientRect();
@@ -1888,16 +1962,6 @@
                         letter.classList.toggle('lantern-revealed', dist < LETTER_REVEAL_DISTANCE);
                     }
                 }
-
-                // Separate, wider check just for the map's slow "tick" -- a quiet
-                // getting-warmer cue with no text attached to it
-                if (secretStrip) {
-                    const stripRect = secretStrip.getBoundingClientRect();
-                    const scx = stripRect.left + stripRect.width / 2;
-                    const scy = stripRect.top + stripRect.height / 2;
-                    const warmDist = Math.hypot(latestX - scx, latestY - scy);
-                    mapEl.classList.toggle('lantern-map-near', warmDist < MAP_TICK_DISTANCE);
-                }
             }
 
             function onPointerMove(e) {
@@ -1910,6 +1974,18 @@
                 }
             }
 
+            function showMapAndFastForward() {
+                mapEl.classList.add('lantern-map-visible');
+                if (ffBtn) ffBtn.classList.add('lantern-map-visible');
+                placeMapX();
+                updateMapOrb();
+            }
+
+            function hideMapAndFastForward() {
+                mapEl.classList.remove('lantern-map-visible');
+                if (ffBtn) ffBtn.classList.remove('lantern-map-visible');
+            }
+
             function activateLantern(x, y) {
                 if (walkTimeoutId) {
                     clearTimeout(walkTimeoutId);
@@ -1918,36 +1994,51 @@
                 lanternActive = true;
                 orb.classList.remove('lantern-walking');
                 orb.style.transition = '';
+                orb.style.transitionDuration = '';
                 orb.classList.add('lantern-active');
-                mapEl.classList.add('lantern-map-visible');
+                showMapAndFastForward();
                 latestX = x;
                 latestY = y;
                 applyFrame();
             }
 
-            function deactivateLantern() {
-                lanternActive = false;
-                mapEl.classList.remove('lantern-map-visible');
-                mapEl.classList.remove('lantern-map-near');
-                secretLetters.forEach((letter) => letter.classList.remove('lantern-revealed'));
-
-                // Walk home: measure exactly where the resting spot is on screen right
-                // now (accounting for scroll/parallax) and animate toward it, legs and
-                // eyes included, rather than snapping straight back.
+            function walkHomeAt(speed) {
                 const rect = anchor.getBoundingClientRect();
                 const targetX = rect.left + rect.width / 2;
                 const targetY = rect.top + rect.height / 2;
 
+                // Measure from wherever the orb actually is right now (its real
+                // rendered position, which matters if this is a fast-forward mid-walk)
+                const currentRect = orb.getBoundingClientRect();
+                const currentX = currentRect.left + currentRect.width / 2;
+                const currentY = currentRect.top + currentRect.height / 2;
+
+                const distance = Math.hypot(targetX - currentX, targetY - currentY);
+                const duration = Math.min(MAX_WALK_DURATION, Math.max(MIN_WALK_DURATION, (distance / speed) * 1000));
+
                 orb.classList.add('lantern-walking');
+                orb.style.transitionDuration = duration + 'ms';
                 void orb.offsetWidth; // force reflow so the transition below is guaranteed to animate, not jump
                 orb.style.transform = `translate3d(${targetX - ORB_RADIUS}px, ${targetY - ORB_RADIUS}px, 0)`;
 
+                if (walkTimeoutId) clearTimeout(walkTimeoutId);
                 walkTimeoutId = setTimeout(() => {
                     orb.classList.remove('lantern-active', 'lantern-walking');
                     orb.style.transition = '';
+                    orb.style.transitionDuration = '';
                     orb.style.transform = '';
                     walkTimeoutId = null;
-                }, WALK_DURATION);
+                    hideMapAndFastForward();
+                }, duration);
+            }
+
+            function deactivateLantern() {
+                lanternActive = false;
+                secretLetters.forEach((letter) => letter.classList.remove('lantern-revealed'));
+                // Walk home: fixed pace, not fixed time -- a short drop and a long drop
+                // both move at the same speed, legs and eyes included, rather than
+                // snapping straight back.
+                walkHomeAt(WALK_SPEED);
             }
 
             orb.addEventListener('click', (e) => {
@@ -1967,12 +2058,25 @@
                 }
             });
 
+            if (ffBtn) {
+                ffBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (orb.classList.contains('lantern-walking')) {
+                        walkHomeAt(FAST_FORWARD_SPEED);
+                    }
+                });
+            }
+
             mapEl.addEventListener('click', (e) => {
                 e.stopPropagation();
-                mapEl.classList.remove('lantern-map-visible');
+                hideMapAndFastForward();
             });
 
             document.addEventListener('pointermove', onPointerMove);
+            window.addEventListener('resize', placeMapX);
+            window.addEventListener('scroll', () => {
+                if (lanternActive) placeMapX();
+            }, { passive: true });
         })();
     </script>
 </body>
