@@ -1911,6 +1911,8 @@
             let latestY = 0;
             let frameQueued = false;
             let walkTimeoutId = null;
+            let currentWalkSpeed = WALK_SPEED;
+            let walkRetargetQueued = false;
 
             // The X markers vertical position (as a fraction of the whole page) never
             // changes once computed, so it is measured once rather than every frame.
@@ -2002,6 +2004,7 @@
             }
 
             function walkHomeAt(speed) {
+                currentWalkSpeed = speed;
                 const rect = anchor.getBoundingClientRect();
                 const targetX = rect.left + rect.width / 2;
                 const targetY = rect.top + rect.height / 2;
@@ -2071,6 +2074,23 @@
                 hideMapAndFastForward();
             });
 
+            function scheduleWalkRetarget() {
+                if (walkRetargetQueued) return;
+                walkRetargetQueued = true;
+                requestAnimationFrame(() => {
+                    walkRetargetQueued = false;
+                    // Re-measure and restart the transition toward the resting spot's
+                    // CURRENT on-screen position -- without this, a target measured
+                    // once at release time goes stale if you scroll during the walk
+                    // (these are slow now, so that's likely), and the orb would
+                    // visibly "correct" with a jump once it finally reverts to its
+                    // real static position.
+                    if (orb.classList.contains('lantern-walking')) {
+                        walkHomeAt(currentWalkSpeed);
+                    }
+                });
+            }
+
             document.addEventListener('pointermove', onPointerMove);
             window.addEventListener('resize', placeMapX);
             window.addEventListener('scroll', () => {
@@ -2078,6 +2098,7 @@
                     placeMapX();
                     updateMapOrb();
                 }
+                scheduleWalkRetarget();
             }, { passive: true });
         })();
     </script>
