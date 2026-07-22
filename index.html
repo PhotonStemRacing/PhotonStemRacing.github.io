@@ -88,6 +88,21 @@
             letter-spacing: 0.5px;
             position: relative;
             transition: background-color 0.5s ease, color 0.5s ease;
+            /* Site-wide text glow. text-shadow inherits, so this reaches every piece
+               of text by default; currentColor means white text glows white, yellow
+               text glows yellow, etc. Anything with its own explicit text-shadow
+               (like the hero title) simply overrides this, and placeholder content
+               is explicitly opted out further down. */
+            text-shadow: 0 0 8px currentColor;
+        }
+
+        /* Placeholder content (empty photo/sponsor/video slots) shouldn't glow like
+           real content does */
+        .member-image-slot,
+        .sponsor-card,
+        .sponsor-logo-layer,
+        .sponsor-video-layer {
+            text-shadow: none;
         }
 
         /* PARALLAX LAYER 1: Cyber Grid Matrix 
@@ -283,9 +298,15 @@
             background-color: var(--dock-bg);
             background-image: linear-gradient(135deg, var(--glass-tint-1) 0%, var(--glass-tint-2) 45%, rgba(255, 235, 0, 0.035) 75%, var(--glass-tint-1) 100%);
             /* Stronger blur than a regular card -- this needs to visibly diffuse
-               whatever is glowing behind it (like the PHOTON title) as you scroll */
-            backdrop-filter: blur(26px) saturate(150%);
-            -webkit-backdrop-filter: blur(26px) saturate(150%);
+               whatever is glowing behind it (like the PHOTON title) as you scroll.
+               Dropped the saturate() that was stacked on top of it though: combining
+               saturate with a large blur radius compounds the per-frame cost of
+               resampling a constantly-changing backdrop during scroll, which is what
+               reintroduced the jitter near the top of the page. The blur alone is
+               still much stronger than the original 14px. */
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            will-change: backdrop-filter;
             border: 1px solid rgba(255, 235, 0, 0.15);
             position: sticky;
             top: 18px;
@@ -1208,8 +1229,22 @@
             left: 0;
             z-index: 150;
             cursor: none;
-            animation: none;
+            /* Pulses via opacity + box-shadow instead of the usual scale-based
+               breatheGlow -- that one animates transform, which would fight the
+               JS-driven translate3d used to track the cursor while held. */
+            animation: lanternHeldPulse 1.6s ease-in-out infinite;
             will-change: transform;
+        }
+
+        @keyframes lanternHeldPulse {
+            0%, 100% {
+                opacity: 0.8;
+                box-shadow: 0 0 25px 10px rgba(255, 235, 0, 0.55), 0 0 60px 25px rgba(255, 235, 0, 0.28), 0 0 120px 50px rgba(255, 235, 0, 0.14);
+            }
+            50% {
+                opacity: 1;
+                box-shadow: 0 0 30px 13px rgba(255, 235, 0, 0.75), 0 0 70px 30px rgba(255, 235, 0, 0.38), 0 0 140px 56px rgba(255, 235, 0, 0.2);
+            }
         }
 
         /* Walking home: small legs and two eyes appear only for this brief transit,
