@@ -589,6 +589,14 @@
             gap: 12px;
         }
 
+        /* Fixed shared width so both buttons match exactly, regardless of the two
+           labels being slightly different lengths */
+        .instagram-btn,
+        .youtube-btn {
+            width: 270px;
+            justify-content: center;
+        }
+
         .instagram-btn {
             display: inline-flex;
             align-items: center;
@@ -1201,6 +1209,7 @@
             .youtube-btn {
                 padding: 12px 22px;
                 font-size: 0.7rem;
+                width: 230px;
             }
 
             section {
