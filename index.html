@@ -582,6 +582,13 @@
             text-transform: uppercase;
         }
 
+        .social-links {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+        }
+
         .instagram-btn {
             display: inline-flex;
             align-items: center;
@@ -602,6 +609,28 @@
         .instagram-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(220, 39, 67, 0.35);
+        }
+
+        .youtube-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(45deg, #ff0000 0%, #cc0000 55%, #8b0000 100%);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .youtube-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 0, 0, 0.4);
         }
 
         /* FULLSCREEN ADJUSTMENTS */
@@ -1126,7 +1155,13 @@
                 font-size: 0.9rem;
             }
 
-            .instagram-btn {
+            .social-links {
+                align-items: flex-start;
+                width: 100%;
+            }
+
+            .instagram-btn,
+            .youtube-btn {
                 padding: 12px 22px;
                 font-size: 0.7rem;
             }
@@ -1469,9 +1504,14 @@
                 <p class="viewer-caption">
                     2024 fastest car from previous development team, <span class="highlight">aramid</span>. this is the fastest car in the states history
                 </p>
-                <a href="https://www.instagram.com/photonstemracing?utm_source=qr&igsh=MW5sNTFzbm5vbXVrdA%3D%3D" target="_blank" rel="noopener" class="instagram-btn">
-                    <span>📸</span> View @photonstemracing
-                </a>
+                <div class="social-links">
+                    <a href="https://www.youtube.com/channel/UCYINNd_Uk7RbN-eBRj2DWyw" target="_blank" rel="noopener" class="youtube-btn">
+                        <span>▶</span> Subscribe on YouTube
+                    </a>
+                    <a href="https://www.instagram.com/photonstemracing?utm_source=qr&igsh=MW5sNTFzbm5vbXVrdA%3D%3D" target="_blank" rel="noopener" class="instagram-btn">
+                        <span>📸</span> View @photonstemracing
+                    </a>
+                </div>
             </div>
         </div>
     </header>
