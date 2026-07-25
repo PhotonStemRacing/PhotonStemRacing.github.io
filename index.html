@@ -1100,9 +1100,14 @@
             position: relative;
             z-index: 35;
             border-top: 1px solid rgba(255, 235, 0, 0.1);
-            background-color: var(--nav-bg);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            /* Was a near-opaque solid block before, which completely hid the lantern
+               orb (and anything else) behind it. Using the same translucent dock
+               background + glass-tint + strong blur as the nav keeps it readable
+               while still letting things behind it show through. */
+            background-color: var(--dock-bg);
+            background-image: linear-gradient(135deg, var(--glass-tint-1) 0%, var(--glass-tint-2) 45%, rgba(255, 235, 0, 0.035) 75%, var(--glass-tint-1) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             padding: 80px 20px;
             text-align: center;
             transition: background-color 0.5s ease;
@@ -1180,7 +1185,9 @@
             font-size: 0.8rem;
             color: var(--page-text-muted);
             border-top: 1px solid rgba(255, 235, 0, 0.1);
-            background-color: var(--footer-bg);
+            background-color: var(--dock-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             letter-spacing: 1.5px;
             transition: background-color 0.5s ease, color 0.5s ease;
         }
