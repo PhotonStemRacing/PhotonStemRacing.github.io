@@ -174,7 +174,8 @@
         .sponsor-card,
         .portfolio-card,
         .contact-box,
-        .logo-wrapper {
+        .logo-wrapper,
+        .app-download-card {
             position: relative;
             overflow: hidden;
             background: linear-gradient(135deg, var(--glass-tint-1) 0%, var(--glass-tint-2) 45%, rgba(255, 235, 0, 0.035) 75%, var(--glass-tint-1) 100%);
@@ -194,7 +195,8 @@
         .sponsor-card::before,
         .portfolio-card::before,
         .contact-box::before,
-        .logo-wrapper::before {
+        .logo-wrapper::before,
+        .app-download-card::before {
             content: '';
             position: absolute;
             inset: 0;
@@ -973,6 +975,67 @@
             text-align: left;
         }
 
+        .app-download-card {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 55px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 235, 0, 0.15);
+            text-align: center;
+        }
+
+        .app-download-text {
+            color: var(--page-text-muted);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin: 0 0 35px 0;
+            text-align: left;
+        }
+
+        .app-download-btn {
+            font-size: 0.9rem;
+            padding: 16px 36px;
+        }
+
+        .app-install-steps {
+            text-align: left;
+            margin-top: 45px;
+            padding-top: 35px;
+            border-top: 1px solid rgba(255, 235, 0, 0.12);
+        }
+
+        .app-install-steps h4 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--primary-yellow);
+            margin: 0 0 20px 0;
+        }
+
+        .app-install-steps ol {
+            color: var(--page-text-muted);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            padding-left: 22px;
+            margin: 0;
+        }
+
+        .app-install-steps li {
+            margin-bottom: 12px;
+        }
+
+        .app-install-steps li:last-child {
+            margin-bottom: 0;
+        }
+
+        .app-install-note {
+            margin: 20px 0 0 0;
+            font-size: 0.85rem;
+            color: var(--page-text-muted);
+            opacity: 0.75;
+            font-style: italic;
+        }
+
         .btn {
             display: inline-block;
             padding: 14px 32px;
@@ -1519,6 +1582,7 @@
             <li><a href="#team">Team</a></li>
             <li><a href="#sponsors">Partners</a></li>
             <li><a href="#portfolios">Docs</a></li>
+            <li><a href="#app">App</a></li>
             <li><a href="#contact">Contact</a></li>
             <li>
                 <a href="https://www.youtube.com/channel/UCYINNd_Uk7RbN-eBRj2DWyw" target="_blank" rel="noopener" class="social-icon-btn youtube-icon-btn" title="YouTube" aria-label="YouTube">
@@ -1702,6 +1766,31 @@
         </div>
     </section>
 
+    <!-- App Download Section -->
+    <section id="app">
+        <h3 class="section-title reveal">Get Our App</h3>
+        <div class="app-download-card reveal">
+            <p class="app-download-text">
+                We've packaged this site into an Android app so you can carry the car, our story, and the team
+                with you. It isn't on the Google Play Store yet, so Android will need your permission to install
+                it manually — that's normal for any app distributed outside the Play Store, not a sign of a problem.
+            </p>
+            <a href="Photon.apk" download class="btn app-download-btn">⬇ Download Photon.apk</a>
+
+            <div class="app-install-steps">
+                <h4>How to install on your Android device</h4>
+                <ol>
+                    <li>Open this page on your <strong>Android phone or tablet</strong> (not a computer), and tap the download button above.</li>
+                    <li>Once it's downloaded, open the file from your notifications or Downloads folder.</li>
+                    <li>Android will likely show a warning about installing from an unknown source — this is standard for any app not from the Play Store. Tap <strong>Settings</strong>, then enable <strong>Allow from this source</strong> for your browser or file manager.</li>
+                    <li>Go back and tap <strong>Install</strong>.</li>
+                    <li>Once installed, open the <strong>Photon</strong> app from your home screen or app drawer.</li>
+                </ol>
+                <p class="app-install-note">Only install APKs from sources you trust. This one is built and distributed directly by our team.</p>
+            </div>
+        </div>
+    </section>
+
     <!-- Dedicated Interactive Contact Section -->
     <section id="contact">
         <h3 class="section-title reveal">Contact Us</h3>
@@ -1757,7 +1846,7 @@
 
         // Randomly assign one of 5 fracture-glass variants to every card-style box,
         // so individual cards of the same type don't all share the exact same pattern.
-        document.querySelectorAll('.team-card, .sponsor-card, .portfolio-card, .contact-box, .logo-wrapper').forEach((el) => {
+        document.querySelectorAll('.team-card, .sponsor-card, .portfolio-card, .contact-box, .logo-wrapper, .app-download-card').forEach((el) => {
             const variant = 1 + Math.floor(Math.random() * 5);
             el.classList.add('fracture-' + variant);
         });
